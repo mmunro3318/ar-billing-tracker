@@ -1,0 +1,29 @@
+:root {
+  --bg-canvas: #1a1e2e;
+  --bg-canvas-alt: #161a29;
+  --bg-panel: #22273b;
+  --bg-panel-soft: #252b42;
+  --bg-panel-strong: #2d3554;
+  --bg-elevated: rgba(42, 49, 74, 0.9);
+  --bg-glass: rgba(34, 39, 59, 0.72);
+  --accent: #7c92fe;
+  --accent-strong: #95a8ff;
+  --accent-soft: rgba(124, 146, 254, 0.16);
+  --text-primary: #a9b4d7;
+  --text-secondary: #8794bf;
+  --text-muted: #5c668d;
+  --success: #62c8a6;
+  --warning: #ffb86b;
+  --danger: #f37a92;
+  --border-soft: rgba(169, 180, 215, 0.08);
+  --border-strong: rgba(124, 146, 254, 0.24);
+  --shadow-soft: 4px 4px 10px rgba(0, 0, 0, 0.3);
+  --shadow-panel: 14px 14px 30px rgba(0, 0, 0, 0.32), inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-raised: 10px 10px 28px rgba(0, 0, 0, 0.34), inset 1px 1px 2px rgba(255, 255, 255, 0.1);
+  --shadow-glow: 0 0 0 1px rgba(124, 146, 254, 0.1), 0 0 24px rgba(124, 146, 254, 0.12);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --font-sans: Inter, Roboto, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}

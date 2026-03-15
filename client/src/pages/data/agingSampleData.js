@@ -1,0 +1,79 @@
+export const agingBuckets = [
+  { label: 'Current', value: '$58,110', count: 24, share: '31%', tone: 'success' },
+  { label: '30 Days', value: '$42,380', count: 18, share: '23%', tone: 'accent' },
+  { label: '60 Days', value: '$36,920', count: 14, share: '20%', tone: 'accent' },
+  { label: '90 Days', value: '$21,870', count: 10, share: '12%', tone: 'warning' },
+  { label: '120+ Days', value: '$15,940', count: 6, share: '9%', tone: 'danger' },
+  { label: 'Uncollectible', value: '$8,940', count: 4, share: '5%', tone: 'muted' },
+]
+
+export const invoiceRows = [
+  {
+    id: 'INV-24031',
+    client: 'M. Ortega',
+    serviceDate: '02 Mar 2026',
+    company: 'BlueCross',
+    billedAmount: '$1,420.00',
+    receivedAmount: '$980.00',
+    status: { label: 'Overdue', tone: 'warning' },
+  },
+  {
+    id: 'INV-24027',
+    client: 'L. Mendoza',
+    serviceDate: '24 Feb 2026',
+    company: 'Aetna',
+    billedAmount: '$880.00',
+    receivedAmount: '$880.00',
+    status: { label: 'Paid', tone: 'success' },
+  },
+  {
+    id: 'INV-23988',
+    client: 'R. Tan',
+    serviceDate: '08 Jan 2026',
+    company: 'Cigna',
+    billedAmount: '$1,960.00',
+    receivedAmount: '$0.00',
+    status: { label: '120+ Days', tone: 'danger' },
+  },
+  {
+    id: 'INV-23954',
+    client: 'J. Lewis',
+    serviceDate: '16 Feb 2026',
+    company: 'Humana',
+    billedAmount: '$640.00',
+    receivedAmount: '$320.00',
+    status: { label: 'Pending Review', tone: 'accent' },
+  },
+]
+
+export const invoiceColumns = [
+  { key: 'client', label: 'Client' },
+  { key: 'serviceDate', label: 'Date Billed' },
+  { key: 'company', label: 'Company' },
+  { key: 'billedAmount', label: 'Billed', align: 'right', mono: true },
+  { key: 'receivedAmount', label: 'Received', align: 'right', mono: true },
+]
+
+export const agingTimelineItems = [
+  {
+    id: 1,
+    title: 'Second reminder queued',
+    detail: 'BlueCross accounts in 90+ buckets were queued for outbound reminders.',
+    meta: '09:10 AM',
+    tone: 'accent',
+  },
+  {
+    id: 2,
+    title: 'Uncollectible review requested',
+    detail: 'Four 120+ day items were escalated for mark-uncollectible review.',
+    meta: 'Yesterday',
+    tone: 'warning',
+  },
+  {
+    id: 3,
+    title: 'Partial payment posted',
+    detail: 'A partial payment reduced total outstanding AR for Humana claims.',
+    meta: 'Yesterday',
+    tone: 'success',
+  },
+]
