@@ -9,12 +9,14 @@ import StatCard from '../components/data-display/StatCard'
 import AgingBucketCard from '../components/domain/AgingBucketCard'
 import Timeline from '../components/data-display/Timeline'
 import DetailList from '../components/composition/DetailList'
-import {
-  dashboardAgingBuckets,
-  dashboardHeroMetrics,
-  dashboardStatCards,
-  dashboardTimelineItems,
-} from './data/dashboardSampleData'
+import dashboardSampleData from './data/dashboardSampleData.json'
+
+const {
+  agingBuckets: dashboardAgingBuckets,
+  heroMetrics: dashboardHeroMetrics,
+  statCards: dashboardStatCards,
+  timelineItems: dashboardTimelineItems,
+} = dashboardSampleData
 
 function DashboardPage({ shell }) {
   const navigate = useNavigate()

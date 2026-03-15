@@ -7,7 +7,17 @@ import Timeline from '../components/data-display/Timeline'
 import AgingBucketCard from '../components/domain/AgingBucketCard'
 import SectionContainer from '../components/composition/SectionContainer'
 import DetailList from '../components/composition/DetailList'
-import { agingBuckets, agingTimelineItems, invoiceColumns, invoiceRows } from './data/agingSampleData'
+import agingSampleData from './data/agingSampleData.json'
+
+const { agingBuckets, invoiceRows, timelineItems: agingTimelineItems } = agingSampleData
+
+const invoiceColumns = [
+  { key: 'client', label: 'Client' },
+  { key: 'serviceDate', label: 'Date Billed' },
+  { key: 'company', label: 'Company' },
+  { key: 'billedAmount', label: 'Billed', align: 'right', mono: true },
+  { key: 'receivedAmount', label: 'Received', align: 'right', mono: true },
+]
 
 const columns = [
   {

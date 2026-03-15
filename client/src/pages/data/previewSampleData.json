@@ -1,0 +1,133 @@
+{
+  "statCards": [
+    {
+      "title": "Open receivables",
+      "value": "$184,220",
+      "trend": { "label": "+8.2%", "context": "vs prior 30-day cycle" },
+      "tone": "accent"
+    },
+    {
+      "title": "Collected this month",
+      "value": "$62,480",
+      "trend": { "label": "On pace", "context": "14 deposits reconciled" },
+      "tone": "success"
+    },
+    {
+      "title": "Pending review",
+      "value": "17",
+      "trend": { "label": "Admin action", "context": "9 invoices and 8 payments" },
+      "tone": "warning"
+    },
+    {
+      "title": "Uncollectible watch",
+      "value": "$8,940",
+      "trend": { "label": "Escalating", "context": "4 items are beyond 120 days" },
+      "tone": "danger"
+    }
+  ],
+  "agingBuckets": [
+    { "label": "Current", "value": "$58,110", "count": 24, "share": "31%", "tone": "success" },
+    { "label": "30 Days", "value": "$42,380", "count": 18, "share": "23%", "tone": "accent" },
+    { "label": "60 Days", "value": "$36,920", "count": 14, "share": "20%", "tone": "accent" },
+    { "label": "90 Days", "value": "$21,870", "count": 10, "share": "12%", "tone": "warning" },
+    { "label": "120+ Days", "value": "$15,940", "count": 6, "share": "9%", "tone": "danger" },
+    { "label": "Uncollectible", "value": "$8,940", "count": 4, "share": "5%", "tone": "muted" }
+  ],
+  "invoiceRows": [
+    {
+      "id": "INV-24031",
+      "client": "M. Ortega",
+      "serviceDate": "02 Mar 2026",
+      "company": "BlueCross",
+      "billedAmount": "$1,420.00",
+      "receivedAmount": "$980.00",
+      "status": { "label": "Overdue", "tone": "warning" }
+    },
+    {
+      "id": "INV-24027",
+      "client": "L. Mendoza",
+      "serviceDate": "24 Feb 2026",
+      "company": "Aetna",
+      "billedAmount": "$880.00",
+      "receivedAmount": "$880.00",
+      "status": { "label": "Paid", "tone": "success" }
+    },
+    {
+      "id": "INV-23988",
+      "client": "R. Tan",
+      "serviceDate": "08 Jan 2026",
+      "company": "Cigna",
+      "billedAmount": "$1,960.00",
+      "receivedAmount": "$0.00",
+      "status": { "label": "120+ Days", "tone": "danger" }
+    },
+    {
+      "id": "INV-23954",
+      "client": "J. Lewis",
+      "serviceDate": "16 Feb 2026",
+      "company": "Humana",
+      "billedAmount": "$640.00",
+      "receivedAmount": "$320.00",
+      "status": { "label": "Pending Review", "tone": "accent" }
+    }
+  ],
+  "reviewRows": [
+    {
+      "id": "REV-114",
+      "type": "Invoice edit",
+      "subject": "M. Ortega / INV-24031",
+      "user": "Dana R.",
+      "submittedAt": "Today 09:18",
+      "change": "Billed amount $1,220.00 -> $1,420.00",
+      "status": { "label": "Needs review", "tone": "warning" }
+    },
+    {
+      "id": "REV-113",
+      "type": "Payment entry",
+      "subject": "J. Lewis / INV-23954",
+      "user": "Alex P.",
+      "submittedAt": "Today 08:42",
+      "change": "Received amount $0.00 -> $320.00",
+      "status": { "label": "Ready", "tone": "accent" }
+    },
+    {
+      "id": "REV-111",
+      "type": "Expense add",
+      "subject": "Merchant processing",
+      "user": "Dana R.",
+      "submittedAt": "Yesterday 16:09",
+      "change": "Category: Ops / Amount: $265.00",
+      "status": { "label": "Queued", "tone": "muted" }
+    }
+  ],
+  "timelineItems": [
+    {
+      "id": 1,
+      "title": "Partial payment posted",
+      "detail": "Received $320.00 against INV-23954 and updated the outstanding balance for J. Lewis.",
+      "meta": "10:04 AM",
+      "tone": "success"
+    },
+    {
+      "id": 2,
+      "title": "Reminder email sent",
+      "detail": "Second reminder issued to BlueCross for INV-24031 with a 7-day follow-up task.",
+      "meta": "09:12 AM",
+      "tone": "accent"
+    },
+    {
+      "id": 3,
+      "title": "Aging threshold crossed",
+      "detail": "R. Tan moved into the 120+ day bucket and is ready for uncollectible review.",
+      "meta": "Yesterday",
+      "tone": "warning"
+    },
+    {
+      "id": 4,
+      "title": "Approval denied",
+      "detail": "Admin rejected a duplicate payment entry and requested source document confirmation.",
+      "meta": "Yesterday",
+      "tone": "danger"
+    }
+  ]
+}
