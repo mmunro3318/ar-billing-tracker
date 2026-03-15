@@ -584,6 +584,22 @@ textarea.field-control {
   gap: 12px;
 }
 
+.stat-header,
+.bucket-header {
+  flex-wrap: wrap;
+}
+
+.stat-header > :first-child,
+.bucket-header > :first-child {
+  min-width: 0;
+}
+
+.stat-header .badge,
+.bucket-header .badge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .stat-value,
 .bucket-value,
 .auth-code {
