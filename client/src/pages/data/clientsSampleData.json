@@ -1,0 +1,86 @@
+{
+  "clientMetrics": [
+    { "label": "Active clients", "value": "24" },
+    { "label": "Avg outstanding balance", "value": "$8,925" },
+    { "label": "Total AR", "value": "$184,220" },
+    { "label": "On-time payment rate", "value": "87%" }
+  ],
+  "clientRows": [
+    {
+      "id": "CLI-001",
+      "name": "BlueCross",
+      "contact": "M. Ortega",
+      "status": { "label": "Active", "tone": "success" },
+      "totalOutstanding": "$24,580",
+      "daysPastDue": "0",
+      "lastPaymentDate": "13 Mar 2026",
+      "paymentHistory": "4/5 on time"
+    },
+    {
+      "id": "CLI-002",
+      "name": "Aetna",
+      "contact": "L. Mendoza",
+      "status": { "label": "Active", "tone": "success" },
+      "totalOutstanding": "$8,220",
+      "daysPastDue": "0",
+      "lastPaymentDate": "12 Mar 2026",
+      "paymentHistory": "5/5 on time"
+    },
+    {
+      "id": "CLI-003",
+      "name": "Cigna",
+      "contact": "R. Tan",
+      "status": { "label": "At risk", "tone": "warning" },
+      "totalOutstanding": "$31,940",
+      "daysPastDue": "45",
+      "lastPaymentDate": "08 Jan 2026",
+      "paymentHistory": "2/5 on time"
+    },
+    {
+      "id": "CLI-004",
+      "name": "Humana",
+      "contact": "J. Lewis",
+      "status": { "label": "Review", "tone": "accent" },
+      "totalOutstanding": "$15,420",
+      "daysPastDue": "15",
+      "lastPaymentDate": "28 Feb 2026",
+      "paymentHistory": "3/5 on time"
+    }
+  ],
+  "selectedClientSummary": [
+    { "label": "Client", "value": "BlueCross" },
+    { "label": "Contact", "value": "M. Ortega" },
+    { "label": "Total AR", "value": "$24,580" },
+    { "label": "Status", "value": "Active" }
+  ],
+  "timelineItems": [
+    {
+      "id": 1,
+      "title": "Payment received",
+      "detail": "BlueCross payment of $12,000 posted against multiple invoices.",
+      "meta": "10:04 AM",
+      "tone": "success"
+    },
+    {
+      "id": 2,
+      "title": "Invoice sent",
+      "detail": "Monthly service invoice for $8,920 issued to Aetna.",
+      "meta": "Yesterday",
+      "tone": "accent"
+    },
+    {
+      "id": 3,
+      "title": "Payment plan agreed",
+      "detail": "Cigna authorized a 3-payment installment plan for overdue balance.",
+      "meta": "2 days ago",
+      "tone": "warning"
+    },
+    {
+      "id": 4,
+      "title": "Reminder scheduled",
+      "detail": "Follow-up reminder set for Humana after partial payment delay.",
+      "meta": "3 days ago",
+      "tone": "accent"
+    }
+  ]
+}

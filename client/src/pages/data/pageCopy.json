@@ -106,6 +106,124 @@
       ]
     }
   },
+  "clients": {
+    "brandCopy": "Client ledger route extracted from preview patterns with reusable table and timeline components.",
+    "topBar": {
+      "eyebrow": "Client List",
+      "title": "Client ledger and payment history",
+      "description": "Track account status, outstanding balances, and timeline activity for all billing clients.",
+      "badge": "Live client sample",
+      "actions": [
+        { "label": "Export list", "variant": "secondary", "size": "sm" },
+        { "label": "Filter at-risk", "variant": "ghost", "size": "sm" }
+      ]
+    },
+    "metricsSection": {
+      "title": "Client health snapshot",
+      "eyebrow": "Overview",
+      "description": "Quick indicators for account volume, receivables pressure, and payment reliability."
+    },
+    "sections": {
+      "clientTable": {
+        "eyebrow": "Accounts",
+        "title": "Client accounts",
+        "description": "Primary ledger showing contact owner, balance pressure, and payment behavior.",
+        "tableTitle": "Client ledger",
+        "tableDescription": "Sorted for review by outstanding totals and aging pressure.",
+        "tableActions": [
+          { "label": "Refresh data", "variant": "ghost", "size": "sm" },
+          { "label": "Open reminders", "variant": "secondary", "size": "sm" }
+        ]
+      },
+      "paymentHistory": {
+        "eyebrow": "Activity",
+        "title": "Recent client activity",
+        "description": "Timeline feed for account-level payment and reminder events.",
+        "timelineTitle": "Payment timeline",
+        "timelineDescription": "Recent transactions and updates impacting client AR."
+      }
+    },
+    "detailPanel": {
+      "title": "Client context",
+      "subtitle": "A quick summary rail for selected account health and recent activity.",
+      "summaryTitle": "Selected client",
+      "summaryEyebrow": "Account summary",
+      "timelineTitle": "Client activity",
+      "timelineDescription": "Recent events for the selected account and reminder workflow."
+    }
+  },
+  "review": {
+    "brandCopy": "Review inbox route extracted from preview with queue, status controls, and audit diffs.",
+    "topBar": {
+      "eyebrow": "Review Inbox",
+      "title": "Admin review workspace",
+      "description": "Review non-admin submissions and apply approve or deny actions before records flow into active AR.",
+      "badge": "Queue active",
+      "actions": {
+        "export": "Export queue",
+        "refresh": "Refresh queue"
+      }
+    },
+    "sections": {
+      "queue": {
+        "eyebrow": "Inbox",
+        "title": "Pending changes",
+        "description": "Queue of proposed updates awaiting approval.",
+        "tableTitle": "Pending changes queue",
+        "tableDescription": "Select one or more rows and apply review actions.",
+        "actions": {
+          "approve": "Approve selected",
+          "deny": "Deny selected",
+          "reset": "Reset mock state"
+        }
+      }
+    },
+    "detailPanel": {
+      "title": "Review context",
+      "subtitle": "Selected queue item metadata with before/after diff details.",
+      "summaryTitle": "Selected item",
+      "summaryEyebrow": "Review entry",
+      "diffTitle": "Field differences",
+      "timelineTitle": "Recent review activity",
+      "timelineDescription": "Queue-level events and SLA context for approvals."
+    }
+  },
+  "audit": {
+    "brandCopy": "Audit workspace route extracted from preview timeline and diff patterns.",
+    "topBar": {
+      "eyebrow": "Audit Log",
+      "title": "Change timeline and diff history",
+      "description": "Review who changed what and inspect before/after values for billing actions.",
+      "badge": "Audit sample feed",
+      "actions": {
+        "filter": "Filter events",
+        "export": "Export log"
+      }
+    },
+    "sections": {
+      "timeline": {
+        "eyebrow": "Audit events",
+        "title": "Event timeline",
+        "description": "Chronological feed of approval, denial, and escalation events.",
+        "timelineTitle": "Audit activity",
+        "timelineDescription": "Timeline stream of AR-impacting updates."
+      },
+      "ledger": {
+        "eyebrow": "Index",
+        "title": "Event index",
+        "description": "Tabular index for selecting a specific event to inspect in the detail rail.",
+        "tableTitle": "Audit event table",
+        "tableDescription": "Choose an event to load its field-level before/after details."
+      }
+    },
+    "detailPanel": {
+      "title": "Event details",
+      "subtitle": "Field-level changes and metadata for the selected audit event.",
+      "summaryTitle": "Event summary",
+      "summaryEyebrow": "Audit entry",
+      "changesTitle": "Field changes"
+    }
+  },
   "placeholders": {
     "brandCopy": "Route placeholders keep navigation and app-shell behavior testable end-to-end.",
     "topBar": {

@@ -1,0 +1,86 @@
+{
+  "auditEvents": [
+    {
+      "id": "AE-001",
+      "title": "Invoice amount updated",
+      "detail": "INV-24031 billed amount changed from $1,220.00 to $1,420.00.",
+      "meta": "10:45 AM",
+      "tone": "accent",
+      "eventType": "Field update",
+      "actor": "S. Johnson",
+      "record": "INV-24031"
+    },
+    {
+      "id": "AE-002",
+      "title": "Invoice approved",
+      "detail": "REV-113 approved and synchronized to AR aging totals.",
+      "meta": "Yesterday",
+      "tone": "success",
+      "eventType": "Approval",
+      "actor": "R. Chen",
+      "record": "REV-113"
+    },
+    {
+      "id": "AE-003",
+      "title": "Payment entry denied",
+      "detail": "Payment adjustment denied pending attachment verification.",
+      "meta": "Yesterday",
+      "tone": "danger",
+      "eventType": "Denial",
+      "actor": "R. Chen",
+      "record": "REV-110"
+    },
+    {
+      "id": "AE-004",
+      "title": "120+ day escalation",
+      "detail": "R. Tan invoice moved into 120+ bucket and flagged for follow-up.",
+      "meta": "2 days ago",
+      "tone": "warning",
+      "eventType": "Escalation",
+      "actor": "System",
+      "record": "INV-23988"
+    }
+  ],
+  "diffByEventId": {
+    "AE-001": [
+      {
+        "id": "AE-001-1",
+        "label": "Billed amount",
+        "before": "$1,220.00",
+        "after": "$1,420.00",
+        "actor": "S. Johnson",
+        "timestamp": "10:45 AM"
+      }
+    ],
+    "AE-002": [
+      {
+        "id": "AE-002-1",
+        "label": "Status",
+        "before": "Needs review",
+        "after": "Approved",
+        "actor": "R. Chen",
+        "timestamp": "Yesterday"
+      }
+    ],
+    "AE-003": [
+      {
+        "id": "AE-003-1",
+        "label": "Status",
+        "before": "Queued",
+        "after": "Denied",
+        "actor": "R. Chen",
+        "timestamp": "Yesterday"
+      }
+    ],
+    "AE-004": [
+      {
+        "id": "AE-004-1",
+        "label": "Aging bucket",
+        "before": "90 Days",
+        "after": "120+ Days",
+        "actor": "System",
+        "timestamp": "2 days ago"
+      }
+    ]
+  }
+}

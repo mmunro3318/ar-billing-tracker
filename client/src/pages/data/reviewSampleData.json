@@ -1,0 +1,86 @@
+{
+  "reviewRows": [
+    {
+      "id": "REV-114",
+      "type": "Invoice edit",
+      "subject": "M. Ortega / INV-24031",
+      "user": "Dana R.",
+      "submittedAt": "Today 09:18",
+      "change": "Billed amount $1,220.00 -> $1,420.00",
+      "status": { "label": "Needs review", "tone": "warning" }
+    },
+    {
+      "id": "REV-113",
+      "type": "Payment entry",
+      "subject": "J. Lewis / INV-23954",
+      "user": "Alex P.",
+      "submittedAt": "Today 08:42",
+      "change": "Received amount $0.00 -> $320.00",
+      "status": { "label": "Ready", "tone": "accent" }
+    },
+    {
+      "id": "REV-111",
+      "type": "Expense add",
+      "subject": "Merchant processing",
+      "user": "Dana R.",
+      "submittedAt": "Yesterday 16:09",
+      "change": "Category: Ops / Amount: $265.00",
+      "status": { "label": "Queued", "tone": "muted" }
+    }
+  ],
+  "diffById": {
+    "REV-114": [
+      {
+        "id": "REV-114-1",
+        "label": "Billed amount correction",
+        "before": "$1,220.00",
+        "after": "$1,420.00",
+        "actor": "M. Ibarra",
+        "timestamp": "Today 09:21"
+      }
+    ],
+    "REV-113": [
+      {
+        "id": "REV-113-1",
+        "label": "Payment receipt posted",
+        "before": "$0.00",
+        "after": "$320.00",
+        "actor": "M. Ibarra",
+        "timestamp": "Today 08:47"
+      }
+    ],
+    "REV-111": [
+      {
+        "id": "REV-111-1",
+        "label": "Expense entry review",
+        "before": "Pending",
+        "after": "Queued",
+        "actor": "C. Vega",
+        "timestamp": "Yesterday 16:20"
+      }
+    ]
+  },
+  "timelineItems": [
+    {
+      "id": 1,
+      "title": "Approval denied",
+      "detail": "Admin rejected duplicate payment entry and requested source document confirmation.",
+      "meta": "Yesterday",
+      "tone": "danger"
+    },
+    {
+      "id": 2,
+      "title": "Batch submitted",
+      "detail": "Three non-admin entries landed in review queue for sign-off.",
+      "meta": "Yesterday",
+      "tone": "accent"
+    },
+    {
+      "id": 3,
+      "title": "SLA reminder",
+      "detail": "Queue includes one invoice change that is approaching approval SLA.",
+      "meta": "Today 09:30",
+      "tone": "warning"
+    }
+  ]
+}
