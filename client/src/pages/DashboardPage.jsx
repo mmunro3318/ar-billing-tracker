@@ -10,6 +10,7 @@ import AgingBucketCard from '../components/domain/AgingBucketCard'
 import Timeline from '../components/data-display/Timeline'
 import DetailList from '../components/composition/DetailList'
 import dashboardSampleData from './data/dashboardSampleData.json'
+import pageCopy from './data/pageCopy.json'
 
 const {
   agingBuckets: dashboardAgingBuckets,
@@ -18,28 +19,28 @@ const {
   timelineItems: dashboardTimelineItems,
 } = dashboardSampleData
 
+const dashboardCopy = pageCopy.dashboard
+
 function DashboardPage({ shell }) {
   const navigate = useNavigate()
 
   const detailPanel = {
-    title: 'Dashboard context',
-    subtitle: 'A compact summary rail for daily cashflow and review pressure before drilling into screens.',
+    title: dashboardCopy.detailPanel.title,
+    subtitle: dashboardCopy.detailPanel.subtitle,
     content: (
       <>
-        <Surface compact glass title="Today at a glance" eyebrow="Ops summary">
-          <DetailList
-            items={[
-              { label: 'Open receivables', value: '$184,220' },
-              { label: 'Pending approvals', value: '17 items' },
-              { label: '120+ Day balance', value: '$15,940' },
-              { label: 'Net inflow', value: '$41,880' },
-            ]}
-          />
+        <Surface
+          compact
+          glass
+          title={dashboardCopy.detailPanel.summaryTitle}
+          eyebrow={dashboardCopy.detailPanel.summaryEyebrow}
+        >
+          <DetailList items={dashboardCopy.detailPanel.summaryItems} />
         </Surface>
         <Timeline
-          description="Fast context from activity affecting AR and review workload."
+          description={dashboardCopy.detailPanel.timelineDescription}
           items={dashboardTimelineItems.slice(0, 3)}
-          title="Recent updates"
+          title={dashboardCopy.detailPanel.timelineTitle}
         />
       </>
     ),
@@ -49,8 +50,8 @@ function DashboardPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: 'AR Billing Tracker',
-        copy: 'Dashboard shell split from preview composition.',
+        title: pageCopy.shell.brandTitle,
+        copy: dashboardCopy.brandCopy,
       }}
       navItems={shell.navItems}
       onNavSelect={shell.onNavigate}
@@ -58,16 +59,23 @@ function DashboardPage({ shell }) {
       topBar={
         <header className="page-header">
           <div className="hero-copy">
-            <span className="eyebrow">Dashboard</span>
-            <h2 className="page-title">AR and operations snapshot</h2>
-            <p className="page-copy">
-              Metrics and aging status extracted from the preview gallery as the new route-level home screen.
-            </p>
+            <span className="eyebrow">{dashboardCopy.topBar.eyebrow}</span>
+            <h2 className="page-title">{dashboardCopy.topBar.title}</h2>
+            <p className="page-copy">{dashboardCopy.topBar.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">Updated 15 Mar 2026</span>
-            <Button onClick={() => navigate('/review')} size="sm" variant="secondary">Open review inbox</Button>
-            <Button leadingDot onClick={() => navigate('/aging')} size="sm">Inspect AR aging</Button>
+            <span className="page-badge">{dashboardCopy.topBar.badge}</span>
+            {dashboardCopy.topBar.actions.map((action) => (
+              <Button
+                key={action.label}
+                leadingDot={Boolean(action.leadingDot)}
+                onClick={() => navigate(action.path)}
+                size={action.size}
+                variant={action.variant}
+              >
+                {action.label}
+              </Button>
+            ))}
           </div>
         </header>
       }
@@ -77,26 +85,33 @@ function DashboardPage({ shell }) {
 
         <section className="section-grid section-grid--hero">
           <Surface
-            description="This route-level dashboard reuses the established panel language while keeping data static for now."
-            eyebrow="Overview"
-            title="Command center"
+            description={dashboardCopy.hero.description}
+            eyebrow={dashboardCopy.hero.eyebrow}
+            title={dashboardCopy.hero.title}
           >
             <div className="button-row">
-              <Button onClick={() => navigate('/aging')} leadingDot>Open AR Aging</Button>
-              <Button onClick={() => navigate('/review')} variant="secondary">Open Review Inbox</Button>
-              <Button onClick={() => navigate('/clients')} variant="ghost">Open Client List</Button>
+              {dashboardCopy.hero.actions.map((action) => (
+                <Button
+                  key={action.label}
+                  leadingDot={Boolean(action.leadingDot)}
+                  onClick={() => navigate(action.path)}
+                  variant={action.variant}
+                >
+                  {action.label}
+                </Button>
+              ))}
             </div>
           </Surface>
 
-          <Surface glass title="Hero metrics" eyebrow="At a glance">
+          <Surface glass title={dashboardCopy.heroMetrics.title} eyebrow={dashboardCopy.heroMetrics.eyebrow}>
             <MetricsGrid items={dashboardHeroMetrics} />
           </Surface>
         </section>
 
         <SectionContainer
-          description="Primary receivables and operational pressure indicators."
-          eyebrow="Metrics"
-          title="Key AR signals"
+          description={dashboardCopy.metricsSection.description}
+          eyebrow={dashboardCopy.metricsSection.eyebrow}
+          title={dashboardCopy.metricsSection.title}
         >
           <div className="section-grid section-grid--stats">
             {dashboardStatCards.map((card) => (
@@ -112,25 +127,19 @@ function DashboardPage({ shell }) {
 
         <section className="section-grid section-grid--timeline">
           <Timeline
-            description="Route-level timeline retained from the preview while backend feeds are pending."
+            description={dashboardCopy.timeline.description}
             items={dashboardTimelineItems}
-            title="Recent cashflow and review activity"
+            title={dashboardCopy.timeline.title}
           />
 
-          <Surface eyebrow="Next actions" title="Recommended follow-ups">
+          <Surface eyebrow={dashboardCopy.nextActions.eyebrow} title={dashboardCopy.nextActions.title}>
             <div className="detail-list">
-              <div className="detail-row">
-                <span className="detail-label">Aging review</span>
-                <strong>4 invoices crossed 120+ days</strong>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Approval load</span>
-                <strong>17 items waiting in review inbox</strong>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Outreach</span>
-                <strong>9 reminders due before next business day</strong>
-              </div>
+              {dashboardCopy.nextActions.items.map((item) => (
+                <div className="detail-row" key={item.label}>
+                  <span className="detail-label">{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              ))}
             </div>
           </Surface>
         </section>

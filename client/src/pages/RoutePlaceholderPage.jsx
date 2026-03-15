@@ -3,26 +3,34 @@ import Surface from '../components/primitives/Surface'
 import Button from '../components/primitives/Button'
 import EmptyStatePanel from '../components/composition/EmptyStatePanel'
 import SectionContainer from '../components/composition/SectionContainer'
+import pageCopy from './data/pageCopy.json'
 
-function RoutePlaceholderPage({ shell, eyebrow, title, description, message }) {
+const placeholderCopy = pageCopy.placeholders
+
+function RoutePlaceholderPage({ shell, pageKey }) {
+  const routeContent = placeholderCopy.routes[pageKey]
+
   const detailPanel = {
-    title,
-    subtitle: 'Route shell is active with placeholder content until this screen gets domain extraction.',
+    title: routeContent.title,
+    subtitle: placeholderCopy.detailPanel.subtitle,
     content: (
-      <Surface compact glass title="Planned implementation" eyebrow="Next up">
+      <Surface
+        compact
+        glass
+        title={placeholderCopy.detailPanel.title}
+        eyebrow={placeholderCopy.detailPanel.eyebrow}
+      >
         <div className="detail-list">
-          <div className="detail-row">
-            <span className="detail-label">State</span>
-            <strong>Routing complete</strong>
-          </div>
-          <div className="detail-row">
-            <span className="detail-label">Page</span>
-            <strong>{title}</strong>
-          </div>
-          <div className="detail-row">
-            <span className="detail-label">Next step</span>
-            <strong>Extract domain sections from preview patterns</strong>
-          </div>
+          {placeholderCopy.detailPanel.items.map((item) => {
+            const value = item.value === '{{title}}' ? routeContent.title : item.value
+
+            return (
+              <div className="detail-row" key={item.label}>
+                <span className="detail-label">{item.label}</span>
+                <strong>{value}</strong>
+              </div>
+            )
+          })}
         </div>
       </Surface>
     ),
@@ -32,8 +40,8 @@ function RoutePlaceholderPage({ shell, eyebrow, title, description, message }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: 'AR Billing Tracker',
-        copy: 'Route placeholders keep navigation and app-shell behavior testable end-to-end.',
+        title: pageCopy.shell.brandTitle,
+        copy: placeholderCopy.brandCopy,
       }}
       navItems={shell.navItems}
       onNavSelect={shell.onNavigate}
@@ -41,28 +49,30 @@ function RoutePlaceholderPage({ shell, eyebrow, title, description, message }) {
       topBar={
         <header className="page-header">
           <div className="hero-copy">
-            <span className="eyebrow">{eyebrow}</span>
-            <h2 className="page-title">{title}</h2>
-            <p className="page-copy">{description}</p>
+            <span className="eyebrow">{routeContent.eyebrow}</span>
+            <h2 className="page-title">{routeContent.title}</h2>
+            <p className="page-copy">{routeContent.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">Placeholder route</span>
-            <Button onClick={() => shell.onNavigate({ path: '/dashboard' })} size="sm" variant="secondary">Back to Dashboard</Button>
+            <span className="page-badge">{placeholderCopy.topBar.badge}</span>
+            <Button onClick={() => shell.onNavigate({ path: '/dashboard' })} size="sm" variant="secondary">
+              {placeholderCopy.topBar.backToDashboard}
+            </Button>
           </div>
         </header>
       }
     >
       <div className="page-stack">
         <SectionContainer
-          description="This route intentionally ships as a thin placeholder in the first routing/screen split cycle."
-          eyebrow="Scaffold"
-          title="Screen in progress"
+          description={placeholderCopy.section.description}
+          eyebrow={placeholderCopy.section.eyebrow}
+          title={placeholderCopy.section.title}
         >
           <EmptyStatePanel
-            description="Use this route to validate URL navigation, responsive shell behavior, and active nav state."
-            eyebrow="Coming next"
-            message={message}
-            title={title}
+            description={placeholderCopy.emptyState.description}
+            eyebrow={placeholderCopy.emptyState.eyebrow}
+            message={routeContent.message}
+            title={routeContent.title}
           />
         </SectionContainer>
       </div>

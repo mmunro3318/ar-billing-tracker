@@ -1,0 +1,161 @@
+{
+  "shell": {
+    "brandTitle": "AR Billing Tracker"
+  },
+  "dashboard": {
+    "brandCopy": "Dashboard shell split from preview composition.",
+    "topBar": {
+      "eyebrow": "Dashboard",
+      "title": "AR and operations snapshot",
+      "description": "Metrics and aging status extracted from the preview gallery as the new route-level home screen.",
+      "badge": "Updated 15 Mar 2026",
+      "actions": [
+        { "label": "Open review inbox", "path": "/review", "variant": "secondary", "size": "sm" },
+        { "label": "Inspect AR aging", "path": "/aging", "leadingDot": true, "size": "sm" }
+      ]
+    },
+    "hero": {
+      "title": "Command center",
+      "eyebrow": "Overview",
+      "description": "This route-level dashboard reuses the established panel language while keeping data static for now.",
+      "actions": [
+        { "label": "Open AR Aging", "path": "/aging", "leadingDot": true },
+        { "label": "Open Review Inbox", "path": "/review", "variant": "secondary" },
+        { "label": "Open Client List", "path": "/clients", "variant": "ghost" }
+      ]
+    },
+    "heroMetrics": {
+      "title": "Hero metrics",
+      "eyebrow": "At a glance"
+    },
+    "metricsSection": {
+      "title": "Key AR signals",
+      "eyebrow": "Metrics",
+      "description": "Primary receivables and operational pressure indicators."
+    },
+    "timeline": {
+      "title": "Recent cashflow and review activity",
+      "description": "Route-level timeline retained from the preview while backend feeds are pending."
+    },
+    "detailPanel": {
+      "title": "Dashboard context",
+      "subtitle": "A compact summary rail for daily cashflow and review pressure before drilling into screens.",
+      "summaryTitle": "Today at a glance",
+      "summaryEyebrow": "Ops summary",
+      "timelineTitle": "Recent updates",
+      "timelineDescription": "Fast context from activity affecting AR and review workload.",
+      "summaryItems": [
+        { "label": "Open receivables", "value": "$184,220" },
+        { "label": "Pending approvals", "value": "17 items" },
+        { "label": "120+ Day balance", "value": "$15,940" },
+        { "label": "Net inflow", "value": "$41,880" }
+      ]
+    },
+    "nextActions": {
+      "title": "Recommended follow-ups",
+      "eyebrow": "Next actions",
+      "items": [
+        { "label": "Aging review", "value": "4 invoices crossed 120+ days" },
+        { "label": "Approval load", "value": "17 items waiting in review inbox" },
+        { "label": "Outreach", "value": "9 reminders due before next business day" }
+      ]
+    }
+  },
+  "aging": {
+    "brandCopy": "Aging workspace route split from the preview gallery.",
+    "topBar": {
+      "eyebrow": "AR Aging",
+      "title": "Bucket drill-down and invoice ledger",
+      "description": "Receivables are grouped by billing age with rapid actions for escalation, exports, and follow-ups.",
+      "badge": "Live sample dataset",
+      "actions": [
+        { "label": "Export aging", "variant": "ghost", "size": "sm" },
+        { "label": "Mark uncollectible", "variant": "secondary", "size": "sm" }
+      ]
+    },
+    "sections": {
+      "buckets": {
+        "title": "Aging distribution",
+        "eyebrow": "Bucket summary",
+        "description": "Shared bucket cards preserved from preview for consistent cross-screen AR summaries."
+      },
+      "ledger": {
+        "title": "Aging invoice table",
+        "eyebrow": "Ledger",
+        "description": "Primary ledger table for AR records, preserving status rendering and compact grid density.",
+        "tableTitle": "Open invoices",
+        "tableDescription": "Date billed drives aging buckets and action prioritization.",
+        "tableActions": [
+          { "label": "Filter overdue", "variant": "ghost", "size": "sm" },
+          { "label": "Open reminders", "variant": "secondary", "size": "sm" }
+        ]
+      }
+    },
+    "detailPanel": {
+      "title": "Invoice detail",
+      "subtitle": "Contextual summary for the selected aging record and related activity.",
+      "summaryTitle": "Selected invoice",
+      "summaryEyebrow": "INV-24031",
+      "timelineTitle": "Invoice activity",
+      "timelineDescription": "Recent events tied to the selected record and its follow-up work.",
+      "summaryItems": [
+        { "label": "Client", "value": "M. Ortega" },
+        { "label": "Company", "value": "BlueCross" },
+        { "label": "Billed", "value": "$1,420.00" },
+        { "label": "Received", "value": "$980.00" }
+      ]
+    }
+  },
+  "placeholders": {
+    "brandCopy": "Route placeholders keep navigation and app-shell behavior testable end-to-end.",
+    "topBar": {
+      "badge": "Placeholder route",
+      "backToDashboard": "Back to Dashboard"
+    },
+    "section": {
+      "title": "Screen in progress",
+      "eyebrow": "Scaffold",
+      "description": "This route intentionally ships as a thin placeholder in the first routing/screen split cycle."
+    },
+    "emptyState": {
+      "eyebrow": "Coming next",
+      "description": "Use this route to validate URL navigation, responsive shell behavior, and active nav state."
+    },
+    "routes": {
+      "clients": {
+        "eyebrow": "Client List",
+        "title": "Client history workspace",
+        "description": "Client ledger, balances, and payment history timeline will be extracted in the next cycle.",
+        "message": "No client panel has been split out yet."
+      },
+      "expenses": {
+        "eyebrow": "Expenses",
+        "title": "Expense tracking workspace",
+        "description": "Expense-category breakdown and cash outflow analysis will be added after AR routing stabilization.",
+        "message": "No expenses widgets have been extracted yet."
+      },
+      "review": {
+        "eyebrow": "Review Inbox",
+        "title": "Admin review workspace",
+        "description": "Pending change queue and diff approvals will be moved from preview into this route next.",
+        "message": "No review queue has been split out yet."
+      },
+      "audit": {
+        "eyebrow": "Audit Log",
+        "title": "Audit timeline workspace",
+        "description": "Audit event streams and before/after diffs will be extracted into this route in a follow-up sprint.",
+        "message": "No audit timeline page has been split out yet."
+      }
+    },
+    "detailPanel": {
+      "subtitle": "Route shell is active with placeholder content until this screen gets domain extraction.",
+      "title": "Planned implementation",
+      "eyebrow": "Next up",
+      "items": [
+        { "label": "State", "value": "Routing complete" },
+        { "label": "Page", "value": "{{title}}" },
+        { "label": "Next step", "value": "Extract domain sections from preview patterns" }
+      ]
+    }
+  }
+}

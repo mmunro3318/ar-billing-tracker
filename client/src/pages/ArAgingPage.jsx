@@ -8,8 +8,10 @@ import AgingBucketCard from '../components/domain/AgingBucketCard'
 import SectionContainer from '../components/composition/SectionContainer'
 import DetailList from '../components/composition/DetailList'
 import agingSampleData from './data/agingSampleData.json'
+import pageCopy from './data/pageCopy.json'
 
 const { agingBuckets, invoiceRows, timelineItems: agingTimelineItems } = agingSampleData
+const agingCopy = pageCopy.aging
 
 const invoiceColumns = [
   { key: 'client', label: 'Client' },
@@ -40,24 +42,22 @@ const columns = [
 
 function ArAgingPage({ shell }) {
   const detailPanel = {
-    title: 'Invoice detail',
-    subtitle: 'Contextual summary for the selected aging record and related activity.',
+    title: agingCopy.detailPanel.title,
+    subtitle: agingCopy.detailPanel.subtitle,
     content: (
       <>
-        <Surface compact glass title="Selected invoice" eyebrow="INV-24031">
-          <DetailList
-            items={[
-              { label: 'Client', value: 'M. Ortega' },
-              { label: 'Company', value: 'BlueCross' },
-              { label: 'Billed', value: '$1,420.00' },
-              { label: 'Received', value: '$980.00' },
-            ]}
-          />
+        <Surface
+          compact
+          glass
+          title={agingCopy.detailPanel.summaryTitle}
+          eyebrow={agingCopy.detailPanel.summaryEyebrow}
+        >
+          <DetailList items={agingCopy.detailPanel.summaryItems} />
         </Surface>
         <Timeline
-          description="Recent events tied to the selected record and its follow-up work."
+          description={agingCopy.detailPanel.timelineDescription}
           items={agingTimelineItems}
-          title="Invoice activity"
+          title={agingCopy.detailPanel.timelineTitle}
         />
       </>
     ),
@@ -67,8 +67,8 @@ function ArAgingPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: 'AR Billing Tracker',
-        copy: 'Aging workspace route split from the preview gallery.',
+        title: pageCopy.shell.brandTitle,
+        copy: agingCopy.brandCopy,
       }}
       navItems={shell.navItems}
       onNavSelect={shell.onNavigate}
@@ -76,25 +76,24 @@ function ArAgingPage({ shell }) {
       topBar={
         <header className="page-header">
           <div className="hero-copy">
-            <span className="eyebrow">AR Aging</span>
-            <h2 className="page-title">Bucket drill-down and invoice ledger</h2>
-            <p className="page-copy">
-              Receivables are grouped by billing age with rapid actions for escalation, exports, and follow-ups.
-            </p>
+            <span className="eyebrow">{agingCopy.topBar.eyebrow}</span>
+            <h2 className="page-title">{agingCopy.topBar.title}</h2>
+            <p className="page-copy">{agingCopy.topBar.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">Live sample dataset</span>
-            <Button size="sm" variant="ghost">Export aging</Button>
-            <Button size="sm" variant="secondary">Mark uncollectible</Button>
+            <span className="page-badge">{agingCopy.topBar.badge}</span>
+            {agingCopy.topBar.actions.map((action) => (
+              <Button key={action.label} size={action.size} variant={action.variant}>{action.label}</Button>
+            ))}
           </div>
         </header>
       }
     >
       <div className="page-stack">
         <SectionContainer
-          description="Shared bucket cards preserved from preview for consistent cross-screen AR summaries."
-          eyebrow="Bucket summary"
-          title="Aging distribution"
+          description={agingCopy.sections.buckets.description}
+          eyebrow={agingCopy.sections.buckets.eyebrow}
+          title={agingCopy.sections.buckets.title}
         >
           <div className="section-grid section-grid--age">
             {agingBuckets.map((bucket) => (
@@ -104,21 +103,22 @@ function ArAgingPage({ shell }) {
         </SectionContainer>
 
         <SectionContainer
-          description="Primary ledger table for AR records, preserving status rendering and compact grid density."
-          eyebrow="Ledger"
-          title="Aging invoice table"
+          description={agingCopy.sections.ledger.description}
+          eyebrow={agingCopy.sections.ledger.eyebrow}
+          title={agingCopy.sections.ledger.title}
         >
           <DataTable
             actions={
               <div className="toolbar-group">
-                <Button size="sm" variant="ghost">Filter overdue</Button>
-                <Button size="sm" variant="secondary">Open reminders</Button>
+                {agingCopy.sections.ledger.tableActions.map((action) => (
+                  <Button key={action.label} size={action.size} variant={action.variant}>{action.label}</Button>
+                ))}
               </div>
             }
             columns={columns}
-            description="Date billed drives aging buckets and action prioritization."
+            description={agingCopy.sections.ledger.tableDescription}
             rows={invoiceRows}
-            title="Open invoices"
+            title={agingCopy.sections.ledger.tableTitle}
           />
         </SectionContainer>
       </div>
