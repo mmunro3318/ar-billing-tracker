@@ -6,6 +6,7 @@
 - `migrate.js`: Applies schema to the SQLite database.
 - `schemaCoverage.js`: Verifies LC spreadsheet fields are mapped to schema columns.
 - `stageBillingImport.js`: Stages CSV/XLSX billing rows into migration staging tables with validation and reject tracking.
+- `promoteStagedBilling.js`: Promotes validated staged rows into normalized domain tables with idempotent dedupe.
 
 ## Quick start
 
@@ -15,6 +16,7 @@ From `prototype/server`:
 npm run db:migrate
 npm run db:coverage
 npm run db:stage-billing -- "../path/to/billing-data.xlsx"
+npm run db:promote-billing
 ```
 
 ## Mapping conventions
@@ -32,8 +34,20 @@ npm run db:stage-billing -- "../path/to/billing-data.xlsx"
 4. Promote valid rows into domain tables (`clients`, `companies`, `invoices`, `payments`, `invoice_payments`).
 5. Recalculate any derived fields and verify aging bucket outputs.
 
+Promotion options:
+
+```bash
+# Promote latest successful or partial import
+npm run db:promote-billing
+
+# Promote a specific import log id
+npm run db:promote-billing -- --import-log-id=12
+
+# Promote a specific import code
+npm run db:promote-billing -- --import-code=IMP-20260316124500
+```
+
 ## Next implementation steps
 
-- Add promotion script: `promoteStagedBilling.js`.
 - Add deterministic code generation strategy for `client_code` / `invoice_code` / `payment_code`.
 - Add reconciliation checks for payment over-allocation and duplicate `reference_no` handling.

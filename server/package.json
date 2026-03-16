@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "db:migrate": "node src/db/migrate.js",
     "db:coverage": "node src/db/schemaCoverage.js",
-    "db:stage-billing": "node src/db/stageBillingImport.js"
+    "db:stage-billing": "node src/db/stageBillingImport.js",
+    "db:promote-billing": "node src/db/promoteStagedBilling.js"
   },
   "keywords": [],
   "author": "",
