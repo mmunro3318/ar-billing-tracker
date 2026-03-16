@@ -1,30 +1,30 @@
 {
   "defaultPath": "/dashboard",
   "navItems": [
-    { "key": "dashboard", "path": "/dashboard", "label": "Dashboard", "meta": "Overview and trends" },
-    { "key": "aging", "path": "/aging", "label": "AR Aging", "meta": "Buckets and drill-downs" },
-    { "key": "clients", "path": "/clients", "label": "Client List", "meta": "History and balances" },
-    { "key": "expenses", "path": "/expenses", "label": "Expenses", "meta": "Cash-flow outflow" },
-    { "key": "review", "path": "/review", "label": "Review Inbox", "meta": "Pending non-admin entries" },
-    { "key": "audit", "path": "/audit", "label": "Audit Log", "meta": "Before and after changes" },
+    { "key": "dashboard", "path": "/dashboard", "label": "Dashboard", "meta": "Overview" },
+    { "key": "aging", "path": "/aging", "label": "AR Aging", "meta": "Aging buckets" },
+    { "key": "clients", "path": "/clients", "label": "Client List", "meta": "Accounts" },
+    { "key": "expenses", "path": "/expenses", "label": "Expenses", "meta": "Outflow" },
+    { "key": "review", "path": "/review", "label": "Review Inbox", "meta": "Pending approvals" },
+    { "key": "audit", "path": "/audit", "label": "Audit Log", "meta": "Change history" },
     {
       "key": "forms",
       "path": null,
       "label": "Forms",
-      "meta": "Data entry",
+      "meta": "Entry",
       "children": [
-        { "key": "forms-new-client", "path": "/forms/new-client", "label": "New Client", "meta": "Create account record" },
-        { "key": "forms-invoices", "path": "/forms/invoices", "label": "Invoice Form", "meta": "Add or update invoice" }
+        { "key": "forms-new-client", "path": "/forms/new-client", "label": "New Client", "meta": "Client" },
+        { "key": "forms-invoices", "path": "/forms/invoices", "label": "Invoice Form", "meta": "Invoice" }
       ]
     },
     {
       "key": "reports",
       "path": null,
       "label": "Reports",
-      "meta": "Analytics",
+      "meta": "Insights",
       "children": [
-        { "key": "reports-aging-summary", "path": "/reports/aging-summary", "label": "Aging Summary", "meta": "Bucket performance" },
-        { "key": "reports-cash-flow", "path": "/reports/cash-flow", "label": "Cash Flow", "meta": "Inflow and outflow" }
+        { "key": "reports-aging-summary", "path": "/reports/aging-summary", "label": "Aging Summary", "meta": "Aging" },
+        { "key": "reports-cash-flow", "path": "/reports/cash-flow", "label": "Cash Flow", "meta": "Cash" }
       ]
     }
   ]

@@ -95,15 +95,11 @@ function AppShell({ brand, navItems, activeKey, onNavSelect, topBar, rightPanel,
       <div className="app-shell">
         <aside className="app-sidebar">
           <div className="brand-lockup">
-            <span className="brand-kicker">Preview System</span>
+            <span className="brand-kicker">AR Billing Tracker</span>
             <h1 className="brand-title">{brand.title}</h1>
             <span className="page-copy">{brand.copy}</span>
           </div>
           <LeftSidebarNav activeKey={activeKey} items={navItems} onSelect={onNavSelect} />
-          <div className="sidebar-footnote">
-            <span className="eyebrow">Aesthetic</span>
-            <p>Neumorphic-dark panels, low-contrast palette, glass overlays, and measured accent blue states.</p>
-          </div>
         </aside>
         <main className="app-main">
           {topBar}
