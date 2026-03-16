@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AppShell from '../components/shell/AppShell'
 import Button from '../components/primitives/Button'
 import Badge from '../components/primitives/Badge'
@@ -12,8 +12,8 @@ import reviewSampleData from './data/reviewSampleData.json'
 import pageCopy from './data/pageCopy.json'
 import { normalizeReviewSampleData } from '../utils/sampleDataContracts'
 import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
+import { fetchJson } from '../utils/apiClient'
 
-const normalizedReviewData = normalizeReviewSampleData(reviewSampleData)
 const reviewCopy = normalizePageCopy('review', pageCopy)
 const shellBrandTitle = getShellBrandTitle(pageCopy)
 const fallbackStatus = { label: 'Unknown', tone: 'muted' }
@@ -33,14 +33,60 @@ function cloneRows(rows) {
 }
 
 function ReviewInboxPage({ shell }) {
-  const initialRows = useMemo(() => cloneRows(normalizedReviewData.reviewRows), [])
+  const [reviewData, setReviewData] = useState(() => normalizeReviewSampleData(reviewSampleData))
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const initialRows = useMemo(() => cloneRows(reviewData.reviewRows), [reviewData.reviewRows])
   const [userRole, setUserRole] = useState('admin')
-  const [queueRows, setQueueRows] = useState(() => initialRows.filter((row) => isPendingStatus(row.status?.label)))
-  const [historyRows, setHistoryRows] = useState(() => initialRows.filter((row) => !isPendingStatus(row.status?.label)))
-  const [selectedIds, setSelectedIds] = useState(() => [initialRows[0]?.id].filter(Boolean))
-  const [selectedRowId, setSelectedRowId] = useState(initialRows[0]?.id ?? null)
+  const [queueRows, setQueueRows] = useState([])
+  const [historyRows, setHistoryRows] = useState([])
+  const [selectedIds, setSelectedIds] = useState([])
+  const [selectedRowId, setSelectedRowId] = useState(null)
   const [reviewActivity, setReviewActivity] = useState([])
   const [currentUser] = useState('Dana R.')
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadReviewInbox() {
+      try {
+        const payload = await fetchJson('/api/review-inbox')
+        if (!isActive) {
+          return
+        }
+
+        setReviewData(normalizeReviewSampleData(payload))
+        setLoadError('')
+      } catch {
+        if (!isActive) {
+          return
+        }
+
+        setReviewData(normalizeReviewSampleData(reviewSampleData))
+        setLoadError('Live data unavailable. Showing sample dataset.')
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadReviewInbox()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  useEffect(() => {
+    const pendingRows = initialRows.filter((row) => isPendingStatus(row.status?.label))
+    const processedRows = initialRows.filter((row) => !isPendingStatus(row.status?.label))
+    setQueueRows(pendingRows)
+    setHistoryRows(processedRows)
+    setSelectedIds([initialRows[0]?.id].filter(Boolean))
+    setSelectedRowId(initialRows[0]?.id ?? null)
+    setReviewActivity([])
+  }, [initialRows])
 
   const dataEntryRows = useMemo(
     () => [...queueRows, ...historyRows].filter((row) => row.user === currentUser),
@@ -59,7 +105,7 @@ function ReviewInboxPage({ shell }) {
     [selectedRowId, visibleRows],
   )
 
-  const selectedDiffs = normalizedReviewData.diffById[selectedRow?.id] ?? []
+  const selectedDiffs = reviewData.diffById[selectedRow?.id] ?? []
 
   const setSelection = (id, checked) => {
     setSelectedIds((prev) => {
@@ -221,7 +267,7 @@ function ReviewInboxPage({ shell }) {
         </Surface>
         <Timeline
           description={reviewCopy.detailPanel.timelineDescription}
-          items={reviewActivity.length ? reviewActivity : normalizedReviewData.timelineItems}
+          items={reviewActivity.length ? reviewActivity : reviewData.timelineItems}
           title={reviewCopy.detailPanel.timelineTitle}
         />
       </>
@@ -246,7 +292,7 @@ function ReviewInboxPage({ shell }) {
             <p className="page-copy">{reviewCopy.topBar.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">{reviewCopy.topBar.badge}</span>
+            <span className="page-badge">{isLoading ? 'Loading live data...' : reviewCopy.topBar.badge}</span>
             <Button
               size="sm"
               variant="ghost"
@@ -264,6 +310,7 @@ function ReviewInboxPage({ shell }) {
       }
     >
       <div className="page-stack">
+        {loadError ? <p className="page-copy">{loadError}</p> : null}
         <SectionContainer
           description={userRole === 'admin' ? reviewCopy.sections.queue.description : `Showing entries submitted by ${currentUser}.`}
           eyebrow={reviewCopy.sections.queue.eyebrow}
@@ -298,7 +345,7 @@ function ReviewInboxPage({ shell }) {
                       size="sm"
                       variant="ghost"
                       onClick={() => {
-                        const baseRows = cloneRows(normalizedReviewData.reviewRows)
+                        const baseRows = cloneRows(reviewData.reviewRows)
                         setQueueRows(baseRows.filter((row) => isPendingStatus(row.status?.label)))
                         setHistoryRows(baseRows.filter((row) => !isPendingStatus(row.status?.label)))
                         setSelectedIds([baseRows[0]?.id].filter(Boolean))

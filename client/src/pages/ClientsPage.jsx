@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AppShell from '../components/shell/AppShell'
 import Button from '../components/primitives/Button'
 import Badge from '../components/primitives/Badge'
@@ -12,9 +12,8 @@ import clientsSampleData from './data/clientsSampleData.json'
 import pageCopy from './data/pageCopy.json'
 import { normalizeClientsSampleData } from '../utils/sampleDataContracts'
 import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
+import { fetchJson } from '../utils/apiClient'
 
-const normalizedClientsData = normalizeClientsSampleData(clientsSampleData)
-const { clientMetrics, clientRows, timelineItems } = normalizedClientsData
 const clientsCopy = normalizePageCopy('clients', pageCopy)
 const shellBrandTitle = getShellBrandTitle(pageCopy)
 const fallbackStatus = { label: 'Unknown', tone: 'muted' }
@@ -46,11 +45,50 @@ const columns = [
 ]
 
 function ClientsPage({ shell }) {
+  const [clientsData, setClientsData] = useState(() => normalizeClientsSampleData(clientsSampleData))
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const { clientMetrics, clientRows, timelineItems } = clientsData
   const [selectedClientId, setSelectedClientId] = useState(clientRows[0]?.id)
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadClients() {
+      try {
+        const payload = await fetchJson('/api/clients')
+        if (!isActive) {
+          return
+        }
+
+        const normalized = normalizeClientsSampleData(payload)
+        setClientsData(normalized)
+        setSelectedClientId(normalized.clientRows[0]?.id)
+        setLoadError('')
+      } catch {
+        if (!isActive) {
+          return
+        }
+
+        setClientsData(normalizeClientsSampleData(clientsSampleData))
+        setLoadError('Live data unavailable. Showing sample dataset.')
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadClients()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   const selectedClient = useMemo(
     () => clientRows.find((row) => row.id === selectedClientId) ?? clientRows[0],
-    [selectedClientId],
+    [clientRows, selectedClientId],
   )
 
   const detailPanel = {
@@ -100,7 +138,7 @@ function ClientsPage({ shell }) {
             <p className="page-copy">{clientsCopy.topBar.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">{clientsCopy.topBar.badge}</span>
+            <span className="page-badge">{isLoading ? 'Loading live data...' : clientsCopy.topBar.badge}</span>
             {clientsCopy.topBar.actions.map((action) => (
               <Button key={action.label} size={action.size} variant={action.variant}>{action.label}</Button>
             ))}
@@ -109,6 +147,7 @@ function ClientsPage({ shell }) {
       }
     >
       <div className="page-stack">
+        {loadError ? <p className="page-copy">{loadError}</p> : null}
         <SectionContainer
           description={clientsCopy.metricsSection.description}
           eyebrow={clientsCopy.metricsSection.eyebrow}
