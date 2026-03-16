@@ -1,0 +1,91 @@
+{
+  "expenseMetrics": [
+    { "label": "Total expenses", "value": "$28,450" },
+    { "label": "This month", "value": "$8,920" },
+    { "label": "Budget remaining", "value": "$6,580" },
+    { "label": "Cash outflow", "value": "Up 12%" }
+  ],
+  "categoryCards": [
+    {
+      "title": "Travel and lodging",
+      "value": "$6,240",
+      "trend": { "label": "+14.2%", "context": "vs prior 30-day cycle" },
+      "tone": "accent"
+    },
+    {
+      "title": "Supplies and equipment",
+      "value": "$5,890",
+      "trend": { "label": "+3.1%", "context": "below budget" },
+      "tone": "success"
+    },
+    {
+      "title": "Professional services",
+      "value": "$8,120",
+      "trend": { "label": "+18.7%", "context": "review recommended" },
+      "tone": "warning"
+    },
+    {
+      "title": "Office operations",
+      "value": "$4,180",
+      "trend": { "label": "-2.4%", "context": "under budget" },
+      "tone": "success"
+    }
+  ],
+  "expenseRows": [
+    {
+      "id": "EXP-2026-0891",
+      "vendor": "Marriott Hotels",
+      "date": "12 Mar 2026",
+      "category": "Travel and lodging",
+      "amount": "$1,240.00",
+      "status": { "label": "Approved", "tone": "success" }
+    },
+    {
+      "id": "EXP-2026-0890",
+      "vendor": "AWS Services",
+      "date": "11 Mar 2026",
+      "category": "Professional services",
+      "amount": "$2,840.00",
+      "status": { "label": "Pending Review", "tone": "accent" }
+    },
+    {
+      "id": "EXP-2026-0889",
+      "vendor": "Staples Business",
+      "date": "10 Mar 2026",
+      "category": "Supplies and equipment",
+      "amount": "$480.00",
+      "status": { "label": "Approved", "tone": "success" }
+    },
+    {
+      "id": "EXP-2026-0888",
+      "vendor": "United Airlines",
+      "date": "09 Mar 2026",
+      "category": "Travel and lodging",
+      "amount": "$640.00",
+      "status": { "label": "Approved", "tone": "success" }
+    }
+  ],
+  "timelineItems": [
+    {
+      "id": 1,
+      "title": "Expense batch approved",
+      "detail": "Q1 travel expenses approved for reimbursement to field team.",
+      "meta": "10:04 AM",
+      "tone": "success"
+    },
+    {
+      "id": 2,
+      "title": "Budget alert issued",
+      "detail": "Professional services category reached 87% of monthly budget.",
+      "meta": "09:12 AM",
+      "tone": "warning"
+    },
+    {
+      "id": 3,
+      "title": "Expense reconciled",
+      "detail": "AWS invoice matched against approved expense request.",
+      "meta": "Yesterday",
+      "tone": "accent"
+    }
+  ]
+}

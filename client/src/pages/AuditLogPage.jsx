@@ -135,7 +135,10 @@ function AuditLogPage({ shell }) {
           <DataTable
             columns={columns}
             description={auditCopy.sections.ledger.tableDescription}
+            onRowClick={setSelectedEventId}
+            rowSelectionEnabled
             rows={auditSampleData.auditEvents}
+            selectedRowId={selectedEventId}
             title={auditCopy.sections.ledger.tableTitle}
           />
         </SectionContainer>

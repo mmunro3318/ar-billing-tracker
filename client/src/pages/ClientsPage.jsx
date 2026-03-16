@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import AppShell from '../components/shell/AppShell'
 import Button from '../components/primitives/Button'
 import Badge from '../components/primitives/Badge'
@@ -10,8 +11,9 @@ import MetricsGrid from '../components/composition/MetricsGrid'
 import clientsSampleData from './data/clientsSampleData.json'
 import pageCopy from './data/pageCopy.json'
 
-const { clientMetrics, clientRows, selectedClientSummary, timelineItems } = clientsSampleData
+const { clientMetrics, clientRows, timelineItems } = clientsSampleData
 const clientsCopy = pageCopy.clients
+const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 const columns = [
   {
@@ -28,7 +30,10 @@ const columns = [
   {
     key: 'status',
     label: 'Status',
-    render: (row) => <Badge tone={row.status.tone}>{row.status.label}</Badge>,
+    render: (row) => {
+      const status = row?.status ?? fallbackStatus
+      return <Badge tone={status.tone}>{status.label}</Badge>
+    },
   },
   { key: 'totalOutstanding', label: 'Outstanding', align: 'right', mono: true },
   { key: 'daysPastDue', label: 'Days Past Due', align: 'right' },
@@ -37,6 +42,13 @@ const columns = [
 ]
 
 function ClientsPage({ shell }) {
+  const [selectedClientId, setSelectedClientId] = useState(clientRows[0]?.id)
+
+  const selectedClient = useMemo(
+    () => clientRows.find((row) => row.id === selectedClientId) ?? clientRows[0],
+    [selectedClientId],
+  )
+
   const detailPanel = {
     title: clientsCopy.detailPanel.title,
     subtitle: clientsCopy.detailPanel.subtitle,
@@ -46,9 +58,16 @@ function ClientsPage({ shell }) {
           compact
           glass
           title={clientsCopy.detailPanel.summaryTitle}
-          eyebrow={clientsCopy.detailPanel.summaryEyebrow}
+          eyebrow={selectedClient?.id ?? clientsCopy.detailPanel.summaryEyebrow}
         >
-          <DetailList items={selectedClientSummary} />
+          <DetailList
+            items={[
+              { label: 'Client', value: selectedClient?.name },
+              { label: 'Contact', value: selectedClient?.contact },
+              { label: 'Total AR', value: selectedClient?.totalOutstanding },
+              { label: 'Status', value: selectedClient?.status?.label ?? fallbackStatus.label },
+            ]}
+          />
         </Surface>
         <Timeline
           description={clientsCopy.detailPanel.timelineDescription}
@@ -109,7 +128,10 @@ function ClientsPage({ shell }) {
             }
             columns={columns}
             description={clientsCopy.sections.clientTable.tableDescription}
+            onRowClick={setSelectedClientId}
+            rowSelectionEnabled
             rows={clientRows}
+            selectedRowId={selectedClientId}
             title={clientsCopy.sections.clientTable.tableTitle}
           />
         </SectionContainer>

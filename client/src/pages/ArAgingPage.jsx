@@ -12,6 +12,7 @@ import pageCopy from './data/pageCopy.json'
 
 const { agingBuckets, invoiceRows, timelineItems: agingTimelineItems } = agingSampleData
 const agingCopy = pageCopy.aging
+const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 const invoiceColumns = [
   { key: 'client', label: 'Client' },
@@ -36,7 +37,10 @@ const columns = [
   {
     key: 'status',
     label: 'Status',
-    render: (row) => <Badge tone={row.status.tone}>{row.status.label}</Badge>,
+    render: (row) => {
+      const status = row?.status ?? fallbackStatus
+      return <Badge tone={status.tone}>{status.label}</Badge>
+    },
   },
 ]
 

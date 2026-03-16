@@ -224,6 +224,45 @@
       "changesTitle": "Field changes"
     }
   },
+  "expenses": {
+    "brandCopy": "Expense tracking route extracted from financial operations patterns with category and ledger views.",
+    "topBar": {
+      "eyebrow": "Expenses",
+      "title": "Expense tracking and budget analysis",
+      "description": "Monitor cash outflow by category, track pending approvals, and reconcile expense records.",
+      "badge": "Live expense sample",
+      "actions": [
+        { "label": "Export expenses", "variant": "ghost", "size": "sm" },
+        { "label": "Flag for review", "variant": "secondary", "size": "sm" }
+      ]
+    },
+    "sections": {
+      "categories": {
+        "title": "Expense categories",
+        "eyebrow": "Breakdown",
+        "description": "Cash outflow by category with trend context and budget pressure signals."
+      },
+      "ledger": {
+        "title": "Expense transactions",
+        "eyebrow": "Ledger",
+        "description": "Individual expenses and reimbursements with approval status context.",
+        "tableTitle": "Recent expenses",
+        "tableDescription": "Sorted by most recent with pending approvals highlighted.",
+        "tableActions": [
+          { "label": "Filter pending", "variant": "ghost", "size": "sm" },
+          { "label": "Approve selected", "variant": "secondary", "size": "sm" }
+        ]
+      }
+    },
+    "detailPanel": {
+      "title": "Expense details",
+      "subtitle": "Contextual summary for the selected expense and related activity.",
+      "summaryTitle": "Selected expense",
+      "summaryEyebrow": "Expense entry",
+      "timelineTitle": "Expense activity",
+      "timelineDescription": "Recent events tied to the selected record and approval workflow."
+    }
+  },
   "placeholders": {
     "brandCopy": "Route placeholders keep navigation and app-shell behavior testable end-to-end.",
     "topBar": {

@@ -12,11 +12,12 @@ import reviewSampleData from './data/reviewSampleData.json'
 import pageCopy from './data/pageCopy.json'
 
 const reviewCopy = pageCopy.review
+const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 function cloneRows(rows) {
   return rows.map((row) => ({
     ...row,
-    status: { ...row.status },
+    status: { ...(row.status ?? fallbackStatus) },
   }))
 }
 
@@ -25,7 +26,7 @@ function ReviewInboxPage({ shell }) {
   const [selectedIds, setSelectedIds] = useState(() => [reviewSampleData.reviewRows[0]?.id].filter(Boolean))
 
   const pendingCount = useMemo(
-    () => queueRows.filter((row) => !['Approved', 'Denied'].includes(row.status.label)).length,
+    () => queueRows.filter((row) => !['Approved', 'Denied'].includes(row.status?.label ?? fallbackStatus.label)).length,
     [queueRows],
   )
 
@@ -67,6 +68,7 @@ function ReviewInboxPage({ shell }) {
           aria-label={`Select ${row.id}`}
           checked={selectedIds.includes(row.id)}
           onChange={(event) => setSelection(row.id, event.target.checked)}
+          onClick={(event) => event.stopPropagation()}
           type="checkbox"
         />
       ),
@@ -79,7 +81,10 @@ function ReviewInboxPage({ shell }) {
     {
       key: 'status',
       label: 'Status',
-      render: (row) => <Badge tone={row.status.tone}>{row.status.label}</Badge>,
+      render: (row) => {
+        const status = row?.status ?? fallbackStatus
+        return <Badge tone={status.tone}>{status.label}</Badge>
+      },
     },
   ]
 
@@ -88,7 +93,7 @@ function ReviewInboxPage({ shell }) {
       { label: 'Review ID', value: selectedRow.id },
       { label: 'Type', value: selectedRow.type },
       { label: 'Submitted by', value: selectedRow.user },
-      { label: 'Status', value: selectedRow.status.label },
+      { label: 'Status', value: selectedRow.status?.label ?? fallbackStatus.label },
     ]
     : []
 
@@ -181,7 +186,10 @@ function ReviewInboxPage({ shell }) {
             }
             columns={columns}
             description={reviewCopy.sections.queue.tableDescription}
+            onRowClick={(rowId) => setSelectedIds([rowId])}
+            rowSelectionEnabled
             rows={queueRows}
+            selectedRowId={selectedRow?.id}
             title={reviewCopy.sections.queue.tableTitle}
           />
         </SectionContainer>

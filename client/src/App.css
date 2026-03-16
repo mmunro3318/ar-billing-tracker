@@ -669,6 +669,14 @@ textarea.field-control {
   background: rgba(45, 53, 84, 0.46);
 }
 
+.table-row--selectable {
+  cursor: pointer;
+}
+
+.table-row--selected td {
+  background: rgba(37, 66, 118, 0.52);
+}
+
 .table-cell--right {
   text-align: right;
 }
