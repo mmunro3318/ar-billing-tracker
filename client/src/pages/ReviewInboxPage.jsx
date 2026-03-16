@@ -10,8 +10,12 @@ import SectionContainer from '../components/composition/SectionContainer'
 import DetailList from '../components/composition/DetailList'
 import reviewSampleData from './data/reviewSampleData.json'
 import pageCopy from './data/pageCopy.json'
+import { normalizeReviewSampleData } from '../utils/sampleDataContracts'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
 
-const reviewCopy = pageCopy.review
+const normalizedReviewData = normalizeReviewSampleData(reviewSampleData)
+const reviewCopy = normalizePageCopy('review', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 function cloneRows(rows) {
@@ -22,8 +26,8 @@ function cloneRows(rows) {
 }
 
 function ReviewInboxPage({ shell }) {
-  const [queueRows, setQueueRows] = useState(() => cloneRows(reviewSampleData.reviewRows))
-  const [selectedIds, setSelectedIds] = useState(() => [reviewSampleData.reviewRows[0]?.id].filter(Boolean))
+  const [queueRows, setQueueRows] = useState(() => cloneRows(normalizedReviewData.reviewRows))
+  const [selectedIds, setSelectedIds] = useState(() => [normalizedReviewData.reviewRows[0]?.id].filter(Boolean))
 
   const pendingCount = useMemo(
     () => queueRows.filter((row) => !['Approved', 'Denied'].includes(row.status?.label ?? fallbackStatus.label)).length,
@@ -35,7 +39,7 @@ function ReviewInboxPage({ shell }) {
     [queueRows, selectedIds],
   )
 
-  const selectedDiffs = reviewSampleData.diffById[selectedRow?.id] ?? []
+  const selectedDiffs = normalizedReviewData.diffById[selectedRow?.id] ?? []
 
   const setSelection = (id, checked) => {
     setSelectedIds((prev) => {
@@ -117,7 +121,7 @@ function ReviewInboxPage({ shell }) {
         </Surface>
         <Timeline
           description={reviewCopy.detailPanel.timelineDescription}
-          items={reviewSampleData.timelineItems}
+          items={normalizedReviewData.timelineItems}
           title={reviewCopy.detailPanel.timelineTitle}
         />
       </>
@@ -128,7 +132,7 @@ function ReviewInboxPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: reviewCopy.brandCopy,
       }}
       navItems={shell.navItems}
@@ -176,8 +180,8 @@ function ReviewInboxPage({ shell }) {
                   size="sm"
                   variant="ghost"
                   onClick={() => {
-                    setQueueRows(cloneRows(reviewSampleData.reviewRows))
-                    setSelectedIds([reviewSampleData.reviewRows[0]?.id].filter(Boolean))
+                    setQueueRows(cloneRows(normalizedReviewData.reviewRows))
+                    setSelectedIds([normalizedReviewData.reviewRows[0]?.id].filter(Boolean))
                   }}
                 >
                   {reviewCopy.sections.queue.actions.reset}

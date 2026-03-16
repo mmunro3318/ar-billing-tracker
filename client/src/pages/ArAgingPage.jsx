@@ -9,9 +9,13 @@ import SectionContainer from '../components/composition/SectionContainer'
 import DetailList from '../components/composition/DetailList'
 import agingSampleData from './data/agingSampleData.json'
 import pageCopy from './data/pageCopy.json'
+import { normalizeAgingSampleData } from '../utils/sampleDataContracts'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
 
-const { agingBuckets, invoiceRows, timelineItems: agingTimelineItems } = agingSampleData
-const agingCopy = pageCopy.aging
+const normalizedAgingData = normalizeAgingSampleData(agingSampleData)
+const { agingBuckets, invoiceRows, timelineItems: agingTimelineItems } = normalizedAgingData
+const agingCopy = normalizePageCopy('aging', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 const invoiceColumns = [
@@ -71,7 +75,7 @@ function ArAgingPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: agingCopy.brandCopy,
       }}
       navItems={shell.navItems}

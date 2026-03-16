@@ -10,6 +10,7 @@ Run these from `prototype/client`:
 npm run lint
 npm run build
 npm run validate:routes
+npm run validate:data
 ```
 
 ## Route Smoke Tests
@@ -30,3 +31,4 @@ npm run validate:routes
 1. Confirm no route-level placeholder copy appears on Clients, Review Inbox, or Audit Log.
 2. Confirm page copy is sourced from `src/pages/data/pageCopy.json`.
 3. Confirm sample data is sourced from route-specific JSON files in `src/pages/data/`.
+4. Confirm `npm run validate:data` passes for all sample contract files.

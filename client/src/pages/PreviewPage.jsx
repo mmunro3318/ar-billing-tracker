@@ -24,14 +24,16 @@ import AuthPanel from '../components/composition/AuthPanel'
 import EmptyStatePanel from '../components/composition/EmptyStatePanel'
 import { NAV_ITEMS } from '../routes/appRoutes'
 import previewSampleData from './data/previewSampleData.json'
+import { normalizePreviewSampleData } from '../utils/sampleDataContracts'
 
+const normalizedPreviewData = normalizePreviewSampleData(previewSampleData)
 const {
   agingBuckets,
   invoiceRows,
   reviewRows,
   statCards,
   timelineItems,
-} = previewSampleData
+} = normalizedPreviewData
 
 const invoiceColumns = [
   {

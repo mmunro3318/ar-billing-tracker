@@ -10,18 +10,22 @@ import SectionContainer from '../components/composition/SectionContainer'
 import DetailList from '../components/composition/DetailList'
 import auditSampleData from './data/auditSampleData.json'
 import pageCopy from './data/pageCopy.json'
+import { normalizeAuditSampleData } from '../utils/sampleDataContracts'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
 
-const auditCopy = pageCopy.audit
+const normalizedAuditData = normalizeAuditSampleData(auditSampleData)
+const auditCopy = normalizePageCopy('audit', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 
 function AuditLogPage({ shell }) {
-  const [selectedEventId, setSelectedEventId] = useState(auditSampleData.auditEvents[0]?.id)
+  const [selectedEventId, setSelectedEventId] = useState(normalizedAuditData.auditEvents[0]?.id)
 
   const selectedEvent = useMemo(
-    () => auditSampleData.auditEvents.find((event) => event.id === selectedEventId) ?? auditSampleData.auditEvents[0],
+    () => normalizedAuditData.auditEvents.find((event) => event.id === selectedEventId) ?? normalizedAuditData.auditEvents[0],
     [selectedEventId],
   )
 
-  const selectedDiffs = auditSampleData.diffByEventId[selectedEvent?.id] ?? []
+  const selectedDiffs = normalizedAuditData.diffByEventId[selectedEvent?.id] ?? []
 
   const columns = [
     {
@@ -93,7 +97,7 @@ function AuditLogPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: auditCopy.brandCopy,
       }}
       navItems={shell.navItems}
@@ -122,7 +126,7 @@ function AuditLogPage({ shell }) {
         >
           <Timeline
             description={auditCopy.sections.timeline.timelineDescription}
-            items={auditSampleData.auditEvents}
+            items={normalizedAuditData.auditEvents}
             title={auditCopy.sections.timeline.timelineTitle}
           />
         </SectionContainer>
@@ -137,7 +141,7 @@ function AuditLogPage({ shell }) {
             description={auditCopy.sections.ledger.tableDescription}
             onRowClick={setSelectedEventId}
             rowSelectionEnabled
-            rows={auditSampleData.auditEvents}
+            rows={normalizedAuditData.auditEvents}
             selectedRowId={selectedEventId}
             title={auditCopy.sections.ledger.tableTitle}
           />

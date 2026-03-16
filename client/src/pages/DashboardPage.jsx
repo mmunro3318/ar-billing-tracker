@@ -11,15 +11,20 @@ import Timeline from '../components/data-display/Timeline'
 import DetailList from '../components/composition/DetailList'
 import dashboardSampleData from './data/dashboardSampleData.json'
 import pageCopy from './data/pageCopy.json'
+import { normalizeDashboardSampleData } from '../utils/sampleDataContracts'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
+
+const normalizedDashboardData = normalizeDashboardSampleData(dashboardSampleData)
 
 const {
   agingBuckets: dashboardAgingBuckets,
   heroMetrics: dashboardHeroMetrics,
   statCards: dashboardStatCards,
   timelineItems: dashboardTimelineItems,
-} = dashboardSampleData
+} = normalizedDashboardData
 
-const dashboardCopy = pageCopy.dashboard
+const dashboardCopy = normalizePageCopy('dashboard', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 
 function DashboardPage({ shell }) {
   const navigate = useNavigate()
@@ -50,7 +55,7 @@ function DashboardPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: dashboardCopy.brandCopy,
       }}
       navItems={shell.navItems}

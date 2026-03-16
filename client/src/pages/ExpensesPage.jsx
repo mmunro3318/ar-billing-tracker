@@ -11,9 +11,13 @@ import DetailList from '../components/composition/DetailList'
 import MetricsGrid from '../components/composition/MetricsGrid'
 import expensesSampleData from './data/expensesSampleData.json'
 import pageCopy from './data/pageCopy.json'
+import { normalizeExpensesSampleData } from '../utils/sampleDataContracts'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
 
-const { expenseMetrics, categoryCards, expenseRows, timelineItems } = expensesSampleData
-const expensesCopy = pageCopy.expenses
+const normalizedExpensesData = normalizeExpensesSampleData(expensesSampleData)
+const { expenseMetrics, categoryCards, expenseRows, timelineItems } = normalizedExpensesData
+const expensesCopy = normalizePageCopy('expenses', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 const columns = [
@@ -81,7 +85,7 @@ function ExpensesPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: expensesCopy.brandCopy,
       }}
       navItems={shell.navItems}

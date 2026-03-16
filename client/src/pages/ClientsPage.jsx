@@ -10,9 +10,13 @@ import DetailList from '../components/composition/DetailList'
 import MetricsGrid from '../components/composition/MetricsGrid'
 import clientsSampleData from './data/clientsSampleData.json'
 import pageCopy from './data/pageCopy.json'
+import { normalizeClientsSampleData } from '../utils/sampleDataContracts'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
 
-const { clientMetrics, clientRows, timelineItems } = clientsSampleData
-const clientsCopy = pageCopy.clients
+const normalizedClientsData = normalizeClientsSampleData(clientsSampleData)
+const { clientMetrics, clientRows, timelineItems } = normalizedClientsData
+const clientsCopy = normalizePageCopy('clients', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
 const columns = [
@@ -82,7 +86,7 @@ function ClientsPage({ shell }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: clientsCopy.brandCopy,
       }}
       navItems={shell.navItems}

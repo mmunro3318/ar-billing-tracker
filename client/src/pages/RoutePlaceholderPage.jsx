@@ -4,11 +4,18 @@ import Button from '../components/primitives/Button'
 import EmptyStatePanel from '../components/composition/EmptyStatePanel'
 import SectionContainer from '../components/composition/SectionContainer'
 import pageCopy from './data/pageCopy.json'
+import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
 
-const placeholderCopy = pageCopy.placeholders
+const placeholderCopy = normalizePageCopy('placeholders', pageCopy)
+const shellBrandTitle = getShellBrandTitle(pageCopy)
 
 function RoutePlaceholderPage({ shell, pageKey }) {
-  const routeContent = placeholderCopy.routes[pageKey]
+  const routeContent = placeholderCopy.routes[pageKey] ?? {
+    eyebrow: 'Route',
+    title: 'Unknown route',
+    description: 'No placeholder copy is defined for this route key yet.',
+    message: 'Add placeholder route copy in pageCopy.json to define this screen.',
+  }
 
   const detailPanel = {
     title: routeContent.title,
@@ -40,7 +47,7 @@ function RoutePlaceholderPage({ shell, pageKey }) {
     <AppShell
       activeKey={shell.activeKey}
       brand={{
-        title: pageCopy.shell.brandTitle,
+        title: shellBrandTitle,
         copy: placeholderCopy.brandCopy,
       }}
       navItems={shell.navItems}
