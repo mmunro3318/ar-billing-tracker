@@ -2,11 +2,16 @@ import './App.css'
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import DashboardPage from './pages/DashboardPage'
 import ArAgingPage from './pages/ArAgingPage'
+import ArAgingBucketDetailPage from './pages/ArAgingBucketDetailPage'
 import ClientsPage from './pages/ClientsPage'
 import ExpensesPage from './pages/ExpensesPage'
 import ReviewInboxPage from './pages/ReviewInboxPage'
 import AuditLogPage from './pages/AuditLogPage'
 import PreviewPage from './pages/PreviewPage'
+import NewClientPage from './pages/NewClientPage'
+import InvoiceFormPage from './pages/InvoiceFormPage'
+import AgingSummaryReportPage from './pages/AgingSummaryReportPage'
+import CashFlowReportPage from './pages/CashFlowReportPage'
 import { DEFAULT_PATH, NAV_ITEMS, getActiveNavKey } from './routes/appRoutes'
 
 function RoutedApp() {
@@ -24,10 +29,15 @@ function RoutedApp() {
       <Route path="/" element={<Navigate replace to={DEFAULT_PATH} />} />
       <Route path="/dashboard" element={<DashboardPage shell={shell} />} />
       <Route path="/aging" element={<ArAgingPage shell={shell} />} />
+      <Route path="/aging/bucket/:bucketName" element={<ArAgingBucketDetailPage shell={shell} />} />
       <Route path="/clients" element={<ClientsPage shell={shell} />} />
       <Route path="/expenses" element={<ExpensesPage shell={shell} />} />
       <Route path="/review" element={<ReviewInboxPage shell={shell} />} />
       <Route path="/audit" element={<AuditLogPage shell={shell} />} />
+      <Route path="/forms/new-client" element={<NewClientPage shell={shell} />} />
+      <Route path="/forms/invoices" element={<InvoiceFormPage shell={shell} />} />
+      <Route path="/reports/aging-summary" element={<AgingSummaryReportPage shell={shell} />} />
+      <Route path="/reports/cash-flow" element={<CashFlowReportPage shell={shell} />} />
       <Route path="/preview" element={<PreviewPage shell={shell} />} />
       <Route path="*" element={<Navigate replace to={DEFAULT_PATH} />} />
     </Routes>

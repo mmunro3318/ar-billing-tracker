@@ -11,6 +11,7 @@
     {
       "id": "INV-24031",
       "client": "M. Ortega",
+      "bucket": "90 Days",
       "serviceDate": "02 Mar 2026",
       "company": "BlueCross",
       "billedAmount": "$1,420.00",
@@ -20,6 +21,7 @@
     {
       "id": "INV-24027",
       "client": "L. Mendoza",
+      "bucket": "Current",
       "serviceDate": "24 Feb 2026",
       "company": "Aetna",
       "billedAmount": "$880.00",
@@ -29,6 +31,7 @@
     {
       "id": "INV-23988",
       "client": "R. Tan",
+      "bucket": "120+ Days",
       "serviceDate": "08 Jan 2026",
       "company": "Cigna",
       "billedAmount": "$1,960.00",
@@ -38,6 +41,7 @@
     {
       "id": "INV-23954",
       "client": "J. Lewis",
+      "bucket": "Uncollectible",
       "serviceDate": "16 Feb 2026",
       "company": "Humana",
       "billedAmount": "$640.00",

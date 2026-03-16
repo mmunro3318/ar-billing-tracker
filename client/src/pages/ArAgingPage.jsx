@@ -48,6 +48,14 @@ const columns = [
   },
 ]
 
+function toBucketSlug(label) {
+  return String(label)
+    .toLowerCase()
+    .replace('+', 'plus')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
+
 function ArAgingPage({ shell }) {
   const detailPanel = {
     title: agingCopy.detailPanel.title,
@@ -105,7 +113,11 @@ function ArAgingPage({ shell }) {
         >
           <div className="section-grid section-grid--age">
             {agingBuckets.map((bucket) => (
-              <AgingBucketCard key={bucket.label} {...bucket} />
+              <AgingBucketCard
+                key={bucket.label}
+                {...bucket}
+                onClick={() => shell.onNavigate({ path: `/aging/bucket/${toBucketSlug(bucket.label)}` })}
+              />
             ))}
           </div>
         </SectionContainer>

@@ -179,6 +179,64 @@ const PAGE_COPY_DEFAULTS = {
       timelineDescription: '',
     },
   },
+  newClientForm: {
+    brandCopy: '',
+    topBar: { eyebrow: 'Forms', title: 'New Client', description: '' },
+    sections: {
+      basic: { eyebrow: 'Client', title: 'Basic', formTitle: 'Client info' },
+      billing: { eyebrow: 'Billing', title: 'Billing', formTitle: 'Billing info' },
+    },
+    detailPanel: {
+      title: 'Client draft',
+      subtitle: '',
+      summaryTitle: 'Summary',
+      summaryEyebrow: 'Draft',
+    },
+  },
+  invoiceForm: {
+    brandCopy: '',
+    topBar: { eyebrow: 'Forms', title: 'Invoice', description: '' },
+    sections: {
+      invoice: { eyebrow: 'Invoice', title: 'Details', formTitle: 'Invoice details' },
+      amounts: { eyebrow: 'Amounts', title: 'Amounts', formTitle: 'Amounts and notes' },
+    },
+    detailPanel: {
+      title: 'Invoice draft',
+      subtitle: '',
+      summaryTitle: 'Summary',
+      summaryEyebrow: 'Draft',
+    },
+  },
+  agingSummaryReport: {
+    brandCopy: '',
+    topBar: { eyebrow: 'Reports', title: 'Aging Summary', description: '' },
+    sections: {
+      summary: { eyebrow: 'Summary', title: 'Aging totals' },
+      report: { eyebrow: 'Report', title: 'Invoice report', tableTitle: 'Aging rows', tableDescription: '' },
+    },
+    detailPanel: {
+      title: 'Selected row',
+      subtitle: '',
+      summaryTitle: 'Invoice',
+      summaryEyebrow: 'Row',
+    },
+  },
+  cashFlowReport: {
+    brandCopy: '',
+    topBar: { eyebrow: 'Reports', title: 'Cash Flow', description: '' },
+    sections: {
+      metrics: { eyebrow: 'Summary', title: 'Cash metrics' },
+      transactions: { eyebrow: 'Report', title: 'Transactions', tableTitle: 'Cashflow rows', tableDescription: '' },
+    },
+    detailPanel: {
+      title: 'Selected row',
+      subtitle: '',
+      summaryTitle: 'Transaction',
+      summaryEyebrow: 'Row',
+      timelineTitle: 'Recent activity',
+      timelineDescription: '',
+    },
+  },
   placeholders: {
     brandCopy: '',
     topBar: { badge: 'Placeholder', backToDashboard: 'Back to Dashboard' },
@@ -189,6 +247,10 @@ const PAGE_COPY_DEFAULTS = {
       expenses: { eyebrow: 'Expenses', title: 'Expenses', description: '', message: '' },
       review: { eyebrow: 'Review', title: 'Review', description: '', message: '' },
       audit: { eyebrow: 'Audit', title: 'Audit', description: '', message: '' },
+      'forms-new-client': { eyebrow: 'Forms', title: 'New Client', description: '', message: '' },
+      'forms-invoices': { eyebrow: 'Forms', title: 'Invoices', description: '', message: '' },
+      'reports-aging-summary': { eyebrow: 'Reports', title: 'Aging Summary', description: '', message: '' },
+      'reports-cash-flow': { eyebrow: 'Reports', title: 'Cash Flow', description: '', message: '' },
     },
     detailPanel: { title: 'Planned implementation', subtitle: '', eyebrow: 'Next up', items: [] },
   },

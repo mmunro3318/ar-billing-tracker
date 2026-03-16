@@ -122,6 +122,11 @@ textarea {
   gap: 8px;
 }
 
+.nav-group {
+  display: grid;
+  gap: 4px;
+}
+
 .nav-item {
   display: flex;
   align-items: center;
@@ -134,6 +139,36 @@ textarea {
   color: var(--text-secondary);
   cursor: pointer;
   transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.nav-item--parent {
+  background: rgba(45, 53, 84, 0.25);
+}
+
+.nav-children {
+  display: grid;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.nav-item--child {
+  margin-left: 14px;
+  padding: 10px 12px;
+}
+
+.nav-item--child .nav-copy strong {
+  font-size: 13px;
+}
+
+.nav-item--child.is-active {
+  background: rgba(52, 61, 94, 0.65);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.nav-chevron {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
 }
 
 .nav-item:hover {
@@ -210,6 +245,10 @@ textarea {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+.section-copy {
+  gap: 4px;
 }
 
 .surface {
@@ -395,8 +434,8 @@ textarea {
 
 .badge--danger {
   color: var(--danger);
-  background: rgba(243, 122, 146, 0.14);
-  border-color: rgba(243, 122, 146, 0.18);
+  background: rgba(243, 122, 146, 0.2);
+  border-color: rgba(243, 122, 146, 0.32);
 }
 
 .badge--muted {
@@ -619,11 +658,19 @@ textarea.field-control {
   grid-column: span 2;
 }
 
+.bucket-card--interactive {
+  border-color: rgba(124, 146, 254, 0.2);
+}
+
 .bucket-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+}
+
+.pending-highlight {
+  color: var(--warning);
 }
 
 .mini-bar {
@@ -652,7 +699,7 @@ textarea.field-control {
 
 .data-table th,
 .data-table td {
-  padding: 14px 12px;
+  padding: 12px;
   text-align: left;
   border-bottom: 1px solid rgba(169, 180, 215, 0.08);
 }

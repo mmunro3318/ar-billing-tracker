@@ -3,21 +3,21 @@
     "brandTitle": "AR Billing Tracker"
   },
   "dashboard": {
-    "brandCopy": "Dashboard shell split from preview composition.",
+    "brandCopy": "AR Center",
     "topBar": {
       "eyebrow": "Dashboard",
-      "title": "AR and operations snapshot",
-      "description": "Metrics and aging status extracted from the preview gallery as the new route-level home screen.",
+      "title": "AR Snapshot",
+      "description": "",
       "badge": "Updated 15 Mar 2026",
       "actions": [
-        { "label": "Open review inbox", "path": "/review", "variant": "secondary", "size": "sm" },
+        { "label": "Review pending (17)", "path": "/review", "variant": "secondary", "size": "sm" },
         { "label": "Inspect AR aging", "path": "/aging", "leadingDot": true, "size": "sm" }
       ]
     },
     "hero": {
-      "title": "Command center",
+      "title": "Overview",
       "eyebrow": "Overview",
-      "description": "This route-level dashboard reuses the established panel language while keeping data static for now.",
+      "description": "",
       "actions": [
         { "label": "Open AR Aging", "path": "/aging", "leadingDot": true },
         { "label": "Open Review Inbox", "path": "/review", "variant": "secondary" },
@@ -29,21 +29,21 @@
       "eyebrow": "At a glance"
     },
     "metricsSection": {
-      "title": "Key AR signals",
+      "title": "Key Metrics",
       "eyebrow": "Metrics",
-      "description": "Primary receivables and operational pressure indicators."
+      "description": ""
     },
     "timeline": {
-      "title": "Recent cashflow and review activity",
-      "description": "Route-level timeline retained from the preview while backend feeds are pending."
+      "title": "Recent Activity",
+      "description": ""
     },
     "detailPanel": {
-      "title": "Dashboard context",
-      "subtitle": "A compact summary rail for daily cashflow and review pressure before drilling into screens.",
+      "title": "Context",
+      "subtitle": "",
       "summaryTitle": "Today at a glance",
       "summaryEyebrow": "Ops summary",
       "timelineTitle": "Recent updates",
-      "timelineDescription": "Fast context from activity affecting AR and review workload.",
+      "timelineDescription": "",
       "summaryItems": [
         { "label": "Open receivables", "value": "$184,220" },
         { "label": "Pending approvals", "value": "17 items" },
@@ -52,7 +52,7 @@
       ]
     },
     "nextActions": {
-      "title": "Recommended follow-ups",
+      "title": "Next Actions",
       "eyebrow": "Next actions",
       "items": [
         { "label": "Aging review", "value": "4 invoices crossed 120+ days" },
@@ -62,11 +62,11 @@
     }
   },
   "aging": {
-    "brandCopy": "Aging workspace route split from the preview gallery.",
+    "brandCopy": "Aging",
     "topBar": {
       "eyebrow": "AR Aging",
-      "title": "Bucket drill-down and invoice ledger",
-      "description": "Receivables are grouped by billing age with rapid actions for escalation, exports, and follow-ups.",
+      "title": "Aging Ledger",
+      "description": "",
       "badge": "Live sample dataset",
       "actions": [
         { "label": "Export aging", "variant": "ghost", "size": "sm" },
@@ -75,16 +75,16 @@
     },
     "sections": {
       "buckets": {
-        "title": "Aging distribution",
+        "title": "Aging Buckets",
         "eyebrow": "Bucket summary",
-        "description": "Shared bucket cards preserved from preview for consistent cross-screen AR summaries."
+        "description": ""
       },
       "ledger": {
-        "title": "Aging invoice table",
+        "title": "Invoices",
         "eyebrow": "Ledger",
-        "description": "Primary ledger table for AR records, preserving status rendering and compact grid density.",
+        "description": "",
         "tableTitle": "Open invoices",
-        "tableDescription": "Date billed drives aging buckets and action prioritization.",
+        "tableDescription": "",
         "tableActions": [
           { "label": "Filter overdue", "variant": "ghost", "size": "sm" },
           { "label": "Open reminders", "variant": "secondary", "size": "sm" }
@@ -92,12 +92,12 @@
       }
     },
     "detailPanel": {
-      "title": "Invoice detail",
-      "subtitle": "Contextual summary for the selected aging record and related activity.",
+      "title": "Invoice",
+      "subtitle": "Selected record",
       "summaryTitle": "Selected invoice",
       "summaryEyebrow": "INV-24031",
       "timelineTitle": "Invoice activity",
-      "timelineDescription": "Recent events tied to the selected record and its follow-up work.",
+      "timelineDescription": "",
       "summaryItems": [
         { "label": "Client", "value": "M. Ortega" },
         { "label": "Company", "value": "BlueCross" },
@@ -107,11 +107,11 @@
     }
   },
   "clients": {
-    "brandCopy": "Client ledger route extracted from preview patterns with reusable table and timeline components.",
+    "brandCopy": "Clients",
     "topBar": {
       "eyebrow": "Client List",
-      "title": "Client ledger and payment history",
-      "description": "Track account status, outstanding balances, and timeline activity for all billing clients.",
+      "title": "Client Ledger",
+      "description": "",
       "badge": "Live client sample",
       "actions": [
         { "label": "Export list", "variant": "secondary", "size": "sm" },
@@ -121,15 +121,15 @@
     "metricsSection": {
       "title": "Client health snapshot",
       "eyebrow": "Overview",
-      "description": "Quick indicators for account volume, receivables pressure, and payment reliability."
+      "description": ""
     },
     "sections": {
       "clientTable": {
         "eyebrow": "Accounts",
-        "title": "Client accounts",
-        "description": "Primary ledger showing contact owner, balance pressure, and payment behavior.",
+        "title": "Accounts",
+        "description": "Owner, balance, payment",
         "tableTitle": "Client ledger",
-        "tableDescription": "Sorted for review by outstanding totals and aging pressure.",
+        "tableDescription": "",
         "tableActions": [
           { "label": "Refresh data", "variant": "ghost", "size": "sm" },
           { "label": "Open reminders", "variant": "secondary", "size": "sm" }
@@ -137,27 +137,27 @@
       },
       "paymentHistory": {
         "eyebrow": "Activity",
-        "title": "Recent client activity",
-        "description": "Timeline feed for account-level payment and reminder events.",
+        "title": "Activity",
+        "description": "",
         "timelineTitle": "Payment timeline",
-        "timelineDescription": "Recent transactions and updates impacting client AR."
+        "timelineDescription": ""
       }
     },
     "detailPanel": {
-      "title": "Client context",
-      "subtitle": "A quick summary rail for selected account health and recent activity.",
+      "title": "Client",
+      "subtitle": "Account status",
       "summaryTitle": "Selected client",
       "summaryEyebrow": "Account summary",
       "timelineTitle": "Client activity",
-      "timelineDescription": "Recent events for the selected account and reminder workflow."
+      "timelineDescription": ""
     }
   },
   "review": {
-    "brandCopy": "Review inbox route extracted from preview with queue, status controls, and audit diffs.",
+    "brandCopy": "Review",
     "topBar": {
       "eyebrow": "Review Inbox",
-      "title": "Admin review workspace",
-      "description": "Review non-admin submissions and apply approve or deny actions before records flow into active AR.",
+      "title": "Review Queue",
+      "description": "",
       "badge": "Queue active",
       "actions": {
         "export": "Export queue",
@@ -167,10 +167,10 @@
     "sections": {
       "queue": {
         "eyebrow": "Inbox",
-        "title": "Pending changes",
-        "description": "Queue of proposed updates awaiting approval.",
+        "title": "Pending",
+        "description": "",
         "tableTitle": "Pending changes queue",
-        "tableDescription": "Select one or more rows and apply review actions.",
+        "tableDescription": "",
         "actions": {
           "approve": "Approve selected",
           "deny": "Deny selected",
@@ -179,21 +179,21 @@
       }
     },
     "detailPanel": {
-      "title": "Review context",
-      "subtitle": "Selected queue item metadata with before/after diff details.",
+      "title": "Review",
+      "subtitle": "",
       "summaryTitle": "Selected item",
       "summaryEyebrow": "Review entry",
       "diffTitle": "Field differences",
       "timelineTitle": "Recent review activity",
-      "timelineDescription": "Queue-level events and SLA context for approvals."
+      "timelineDescription": ""
     }
   },
   "audit": {
-    "brandCopy": "Audit workspace route extracted from preview timeline and diff patterns.",
+    "brandCopy": "Audit",
     "topBar": {
       "eyebrow": "Audit Log",
-      "title": "Change timeline and diff history",
-      "description": "Review who changed what and inspect before/after values for billing actions.",
+      "title": "Change Log",
+      "description": "",
       "badge": "Audit sample feed",
       "actions": {
         "filter": "Filter events",
@@ -203,33 +203,33 @@
     "sections": {
       "timeline": {
         "eyebrow": "Audit events",
-        "title": "Event timeline",
-        "description": "Chronological feed of approval, denial, and escalation events.",
+        "title": "Timeline",
+        "description": "",
         "timelineTitle": "Audit activity",
-        "timelineDescription": "Timeline stream of AR-impacting updates."
+        "timelineDescription": ""
       },
       "ledger": {
         "eyebrow": "Index",
         "title": "Event index",
-        "description": "Tabular index for selecting a specific event to inspect in the detail rail.",
+        "description": "",
         "tableTitle": "Audit event table",
-        "tableDescription": "Choose an event to load its field-level before/after details."
+        "tableDescription": ""
       }
     },
     "detailPanel": {
-      "title": "Event details",
-      "subtitle": "Field-level changes and metadata for the selected audit event.",
+      "title": "Event",
+      "subtitle": "",
       "summaryTitle": "Event summary",
       "summaryEyebrow": "Audit entry",
       "changesTitle": "Field changes"
     }
   },
   "expenses": {
-    "brandCopy": "Expense tracking route extracted from financial operations patterns with category and ledger views.",
+    "brandCopy": "Expenses",
     "topBar": {
       "eyebrow": "Expenses",
-      "title": "Expense tracking and budget analysis",
-      "description": "Monitor cash outflow by category, track pending approvals, and reconcile expense records.",
+      "title": "Expense Ledger",
+      "description": "",
       "badge": "Live expense sample",
       "actions": [
         { "label": "Export expenses", "variant": "ghost", "size": "sm" },
@@ -238,16 +238,16 @@
     },
     "sections": {
       "categories": {
-        "title": "Expense categories",
+        "title": "Categories",
         "eyebrow": "Breakdown",
-        "description": "Cash outflow by category with trend context and budget pressure signals."
+        "description": ""
       },
       "ledger": {
-        "title": "Expense transactions",
+        "title": "Transactions",
         "eyebrow": "Ledger",
-        "description": "Individual expenses and reimbursements with approval status context.",
+        "description": "",
         "tableTitle": "Recent expenses",
-        "tableDescription": "Sorted by most recent with pending approvals highlighted.",
+        "tableDescription": "",
         "tableActions": [
           { "label": "Filter pending", "variant": "ghost", "size": "sm" },
           { "label": "Approve selected", "variant": "secondary", "size": "sm" }
@@ -255,16 +255,122 @@
       }
     },
     "detailPanel": {
-      "title": "Expense details",
-      "subtitle": "Contextual summary for the selected expense and related activity.",
+      "title": "Expense",
+      "subtitle": "",
       "summaryTitle": "Selected expense",
       "summaryEyebrow": "Expense entry",
       "timelineTitle": "Expense activity",
-      "timelineDescription": "Recent events tied to the selected record and approval workflow."
+      "timelineDescription": ""
+    }
+  },
+  "newClientForm": {
+    "brandCopy": "Form",
+    "topBar": {
+      "eyebrow": "Forms",
+      "title": "New Client",
+      "description": ""
+    },
+    "sections": {
+      "basic": {
+        "eyebrow": "Client",
+        "title": "Basic",
+        "formTitle": "Client info"
+      },
+      "billing": {
+        "eyebrow": "Billing",
+        "title": "Billing",
+        "formTitle": "Billing setup"
+      }
+    },
+    "detailPanel": {
+      "title": "Client draft",
+      "subtitle": "",
+      "summaryTitle": "Current values",
+      "summaryEyebrow": "Draft"
+    }
+  },
+  "invoiceForm": {
+    "brandCopy": "Form",
+    "topBar": {
+      "eyebrow": "Forms",
+      "title": "Invoice",
+      "description": ""
+    },
+    "sections": {
+      "invoice": {
+        "eyebrow": "Invoice",
+        "title": "Details",
+        "formTitle": "Invoice details"
+      },
+      "amounts": {
+        "eyebrow": "Amounts",
+        "title": "Amounts",
+        "formTitle": "Amounts and notes"
+      }
+    },
+    "detailPanel": {
+      "title": "Invoice draft",
+      "subtitle": "",
+      "summaryTitle": "Current values",
+      "summaryEyebrow": "Draft"
+    }
+  },
+  "agingSummaryReport": {
+    "brandCopy": "Report",
+    "topBar": {
+      "eyebrow": "Reports",
+      "title": "Aging Summary",
+      "description": ""
+    },
+    "sections": {
+      "summary": {
+        "eyebrow": "Summary",
+        "title": "Aging totals"
+      },
+      "report": {
+        "eyebrow": "Report",
+        "title": "Invoice rows",
+        "tableTitle": "Aging rows",
+        "tableDescription": "Filters"
+      }
+    },
+    "detailPanel": {
+      "title": "Selected invoice",
+      "subtitle": "",
+      "summaryTitle": "Invoice",
+      "summaryEyebrow": "Selection"
+    }
+  },
+  "cashFlowReport": {
+    "brandCopy": "Report",
+    "topBar": {
+      "eyebrow": "Reports",
+      "title": "Cash Flow",
+      "description": ""
+    },
+    "sections": {
+      "metrics": {
+        "eyebrow": "Summary",
+        "title": "Cash metrics"
+      },
+      "transactions": {
+        "eyebrow": "Report",
+        "title": "Transactions",
+        "tableTitle": "Cashflow rows",
+        "tableDescription": "Filters"
+      }
+    },
+    "detailPanel": {
+      "title": "Selected transaction",
+      "subtitle": "",
+      "summaryTitle": "Transaction",
+      "summaryEyebrow": "Selection",
+      "timelineTitle": "Recent activity",
+      "timelineDescription": ""
     }
   },
   "placeholders": {
-    "brandCopy": "Route placeholders keep navigation and app-shell behavior testable end-to-end.",
+    "brandCopy": "Placeholder",
     "topBar": {
       "badge": "Placeholder route",
       "backToDashboard": "Back to Dashboard"
@@ -272,46 +378,70 @@
     "section": {
       "title": "Screen in progress",
       "eyebrow": "Scaffold",
-      "description": "This route intentionally ships as a thin placeholder in the first routing/screen split cycle."
+      "description": ""
     },
     "emptyState": {
       "eyebrow": "Coming next",
-      "description": "Use this route to validate URL navigation, responsive shell behavior, and active nav state."
+      "description": ""
     },
     "routes": {
       "clients": {
         "eyebrow": "Client List",
-        "title": "Client history workspace",
-        "description": "Client ledger, balances, and payment history timeline will be extracted in the next cycle.",
+        "title": "Client workspace",
+        "description": "",
         "message": "No client panel has been split out yet."
       },
       "expenses": {
         "eyebrow": "Expenses",
-        "title": "Expense tracking workspace",
-        "description": "Expense-category breakdown and cash outflow analysis will be added after AR routing stabilization.",
+        "title": "Expense workspace",
+        "description": "",
         "message": "No expenses widgets have been extracted yet."
       },
       "review": {
         "eyebrow": "Review Inbox",
-        "title": "Admin review workspace",
-        "description": "Pending change queue and diff approvals will be moved from preview into this route next.",
+        "title": "Review workspace",
+        "description": "",
         "message": "No review queue has been split out yet."
       },
       "audit": {
         "eyebrow": "Audit Log",
-        "title": "Audit timeline workspace",
-        "description": "Audit event streams and before/after diffs will be extracted into this route in a follow-up sprint.",
+        "title": "Audit workspace",
+        "description": "",
         "message": "No audit timeline page has been split out yet."
+      },
+      "forms-new-client": {
+        "eyebrow": "Forms",
+        "title": "Add new client",
+        "description": "",
+        "message": "Client creation form scaffolding is ready for workflow build-out."
+      },
+      "forms-invoices": {
+        "eyebrow": "Forms",
+        "title": "Invoice form",
+        "description": "",
+        "message": "Invoice form interactions are planned for the next implementation cycle."
+      },
+      "reports-aging-summary": {
+        "eyebrow": "Reports",
+        "title": "Aging summary report",
+        "description": "",
+        "message": "Report layout is staged while data wiring is finalized."
+      },
+      "reports-cash-flow": {
+        "eyebrow": "Reports",
+        "title": "Cash flow report",
+        "description": "",
+        "message": "Cash flow report scaffolding is in place for API integration."
       }
     },
     "detailPanel": {
-      "subtitle": "Route shell is active with placeholder content until this screen gets domain extraction.",
+      "subtitle": "",
       "title": "Planned implementation",
       "eyebrow": "Next up",
       "items": [
         { "label": "State", "value": "Routing complete" },
         { "label": "Page", "value": "{{title}}" },
-        { "label": "Next step", "value": "Extract domain sections from preview patterns" }
+        { "label": "Next step", "value": "Build screen" }
       ]
     }
   }

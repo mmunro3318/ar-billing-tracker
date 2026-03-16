@@ -14,8 +14,16 @@ const routeConfig = JSON.parse(fs.readFileSync(routeConfigPath, 'utf8'))
 const errors = []
 
 for (const item of routeConfig.navItems) {
-  if (!appSource.includes(`path="${item.path}"`)) {
+  if (item.path && !appSource.includes(`path="${item.path}"`)) {
     errors.push(`Missing route in App.jsx for nav item ${item.key} (${item.path})`)
+  }
+
+  if (Array.isArray(item.children)) {
+    item.children.forEach((child) => {
+      if (!child.path || !appSource.includes(`path="${child.path}"`)) {
+        errors.push(`Missing route in App.jsx for nav child ${child.key} (${child.path})`)
+      }
+    })
   }
 }
 

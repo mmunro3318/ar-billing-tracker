@@ -1,0 +1,28 @@
+{
+  "formDefaults": {
+    "clientName": "",
+    "primaryContact": "",
+    "email": "",
+    "phone": "",
+    "company": "BlueCross",
+    "billingCycle": "monthly",
+    "paymentTerms": "net-30",
+    "notes": ""
+  },
+  "companyOptions": [
+    { "label": "BlueCross", "value": "BlueCross" },
+    { "label": "Aetna", "value": "Aetna" },
+    { "label": "Cigna", "value": "Cigna" },
+    { "label": "Humana", "value": "Humana" }
+  ],
+  "billingCycleOptions": [
+    { "label": "Monthly", "value": "monthly" },
+    { "label": "Bi-weekly", "value": "biweekly" },
+    { "label": "Weekly", "value": "weekly" }
+  ],
+  "paymentTermOptions": [
+    { "label": "Net 15", "value": "net-15" },
+    { "label": "Net 30", "value": "net-30" },
+    { "label": "Net 45", "value": "net-45" }
+  ]
+}

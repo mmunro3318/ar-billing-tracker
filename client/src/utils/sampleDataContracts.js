@@ -87,6 +87,7 @@ function normalizeInvoiceRow(item, index) {
   return {
     id: asId(row.id, `INV-MISSING-${index + 1}`),
     client: asString(row.client, 'Unknown client'),
+    bucket: asString(row.bucket, asString(row.status?.label, 'Unknown')),
     serviceDate: asString(row.serviceDate, 'Unknown date'),
     company: asString(row.company, 'Unknown company'),
     billedAmount: asString(row.billedAmount, '$0.00'),
@@ -104,6 +105,8 @@ function normalizeReviewRow(item, index) {
     user: asString(row.user, 'Unknown user'),
     submittedAt: asString(row.submittedAt, 'Unknown time'),
     change: asString(row.change, 'No diff available'),
+    denialNote: asString(row.denialNote, ''),
+    reviewedAt: asString(row.reviewedAt, ''),
     status: asStatus(row.status),
   }
 }
@@ -237,4 +240,109 @@ export function normalizePreviewSampleData(rawData) {
     statCards: asArray(data.statCards).map(normalizeStatCard),
     timelineItems: asArray(data.timelineItems).map(normalizeTimelineItem),
   }
+}
+
+function normalizeOption(item, index) {
+  const option = asObject(item)
+  return {
+    label: asString(option.label, `Option ${index + 1}`),
+    value: asString(option.value, `option-${index + 1}`),
+  }
+}
+
+export function normalizeNewClientSampleData(rawData) {
+  const data = asObject(rawData)
+  return {
+    formDefaults: asObject(data.formDefaults),
+    companyOptions: asArray(data.companyOptions).map(normalizeOption),
+    billingCycleOptions: asArray(data.billingCycleOptions).map(normalizeOption),
+    paymentTermOptions: asArray(data.paymentTermOptions).map(normalizeOption),
+  }
+}
+
+export function normalizeInvoiceFormSampleData(rawData) {
+  const data = asObject(rawData)
+  return {
+    formDefaults: asObject(data.formDefaults),
+    clientOptions: asArray(data.clientOptions).map(normalizeOption),
+    statusOptions: asArray(data.statusOptions).map(normalizeOption),
+  }
+}
+
+export function normalizeAgingSummaryReportData(rawData) {
+  const data = asObject(rawData)
+  return {
+    filters: asObject(data.filters),
+    bucketOptions: asArray(data.bucketOptions).map(normalizeOption),
+    statusOptions: asArray(data.statusOptions).map(normalizeOption),
+    summaryMetrics: asArray(data.summaryMetrics).map(normalizeMetric),
+  }
+}
+
+export function normalizeCashFlowReportData(rawData) {
+  const data = asObject(rawData)
+  return {
+    filters: asObject(data.filters),
+    periodOptions: asArray(data.periodOptions).map(normalizeOption),
+    categoryOptions: asArray(data.categoryOptions).map(normalizeOption),
+    flowMetrics: asArray(data.flowMetrics).map(normalizeStatCard),
+    transactionRows: asArray(data.transactionRows).map((item, index) => {
+      const row = asObject(item)
+      return {
+        id: asId(row.id, `CF-${index + 1}`),
+        date: asString(row.date, 'Unknown date'),
+        period: asString(row.period, 'month'),
+        category: asString(row.category, 'all'),
+        description: asString(row.description, 'No description'),
+        inflow: asString(row.inflow, '$0'),
+        outflow: asString(row.outflow, '$0'),
+        net: asString(row.net, '$0'),
+        status: asStatus(row.status),
+      }
+    }),
+    timelineItems: asArray(data.timelineItems).map(normalizeTimelineItem),
+  }
+}
+
+function normalizeBucketName(value) {
+  return String(value)
+    .toLowerCase()
+    .replace('120+', '120 plus')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+export function filterInvoicesByBucket(invoiceRows, bucketName) {
+  const key = normalizeBucketName(bucketName)
+
+  return asArray(invoiceRows).filter((row) => {
+    const bucket = normalizeBucketName(row?.bucket)
+    const status = normalizeBucketName(row?.status?.label)
+
+    if (key === 'current') {
+      return bucket === 'current' || status === 'paid'
+    }
+
+    if (key === '30 days') {
+      return bucket === '30 days'
+    }
+
+    if (key === '60 days') {
+      return bucket === '60 days'
+    }
+
+    if (key === '90 days') {
+      return bucket === '90 days' || status === 'overdue'
+    }
+
+    if (key === '120 plus days') {
+      return bucket === '120 plus days' || status === '120 days'
+    }
+
+    if (key === 'uncollectible') {
+      return bucket === 'uncollectible' || status === 'pending review'
+    }
+
+    return bucket === key || status === key
+  })
 }

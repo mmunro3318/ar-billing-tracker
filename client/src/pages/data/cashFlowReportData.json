@@ -1,0 +1,35 @@
+{
+  "filters": {
+    "period": "month",
+    "category": "all"
+  },
+  "periodOptions": [
+    { "label": "Month", "value": "month" },
+    { "label": "Quarter", "value": "quarter" },
+    { "label": "Year", "value": "year" }
+  ],
+  "categoryOptions": [
+    { "label": "All", "value": "all" },
+    { "label": "Receivables", "value": "receivables" },
+    { "label": "Operations", "value": "operations" },
+    { "label": "Payroll", "value": "payroll" },
+    { "label": "Vendors", "value": "vendors" }
+  ],
+  "flowMetrics": [
+    { "title": "Inflow", "value": "$62,480", "trend": { "label": "+4.2%", "context": "vs prior period" }, "tone": "success" },
+    { "title": "Outflow", "value": "$28,330", "trend": { "label": "Stable", "context": "within target" }, "tone": "accent" },
+    { "title": "Net", "value": "$34,150", "trend": { "label": "Positive", "context": "cash position" }, "tone": "success" },
+    { "title": "Variance", "value": "$3,420", "trend": { "label": "Watch", "context": "ops spend" }, "tone": "warning" }
+  ],
+  "transactionRows": [
+    { "id": "CF-001", "date": "15 Mar 2026", "period": "month", "category": "receivables", "description": "Client payment batch", "inflow": "$12,000", "outflow": "$0", "net": "$12,000", "status": { "label": "Posted", "tone": "success" } },
+    { "id": "CF-002", "date": "14 Mar 2026", "period": "month", "category": "operations", "description": "Software subscriptions", "inflow": "$0", "outflow": "$1,240", "net": "-$1,240", "status": { "label": "Paid", "tone": "accent" } },
+    { "id": "CF-003", "date": "12 Mar 2026", "period": "quarter", "category": "payroll", "description": "Payroll run", "inflow": "$0", "outflow": "$14,200", "net": "-$14,200", "status": { "label": "Paid", "tone": "warning" } },
+    { "id": "CF-004", "date": "10 Mar 2026", "period": "year", "category": "vendors", "description": "Vendor settlement", "inflow": "$0", "outflow": "$3,500", "net": "-$3,500", "status": { "label": "Reviewed", "tone": "muted" } }
+  ],
+  "timelineItems": [
+    { "id": "CFT-1", "title": "Receivables posted", "detail": "Daily batch posted to cash position.", "meta": "Today", "tone": "success" },
+    { "id": "CFT-2", "title": "Ops spend flagged", "detail": "Subscription variance noted for review.", "meta": "Yesterday", "tone": "warning" },
+    { "id": "CFT-3", "title": "Quarter close prep", "detail": "Cashflow summary prepared for finance.", "meta": "2 days ago", "tone": "accent" }
+  ]
+}

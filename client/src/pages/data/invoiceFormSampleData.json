@@ -1,0 +1,24 @@
+{
+  "formDefaults": {
+    "invoiceCode": "",
+    "client": "CLI-001",
+    "serviceDate": "",
+    "dateBilled": "",
+    "company": "BlueCross",
+    "billedAmount": "",
+    "receivedAmount": "",
+    "status": "needs-review",
+    "notes": ""
+  },
+  "clientOptions": [
+    { "label": "BlueCross / M. Ortega", "value": "CLI-001" },
+    { "label": "Aetna / L. Mendoza", "value": "CLI-002" },
+    { "label": "Cigna / R. Tan", "value": "CLI-003" },
+    { "label": "Humana / J. Lewis", "value": "CLI-004" }
+  ],
+  "statusOptions": [
+    { "label": "Needs review", "value": "needs-review" },
+    { "label": "Ready", "value": "ready" },
+    { "label": "Queued", "value": "queued" }
+  ]
+}

@@ -1,14 +1,14 @@
 .page-stack {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: 12px;
   padding-bottom: 8px;
 }
 
@@ -37,7 +37,7 @@
 
 .section-grid {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .section-grid--hero {
@@ -60,7 +60,7 @@
 .section-shell {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .section-heading {
@@ -138,6 +138,10 @@
 }
 
 @media (max-width: 760px) {
+  .page-stack {
+    gap: 14px;
+  }
+
   .page-header,
   .section-heading,
   .read-only-banner,

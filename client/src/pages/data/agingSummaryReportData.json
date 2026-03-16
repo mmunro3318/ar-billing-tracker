@@ -1,0 +1,28 @@
+{
+  "filters": {
+    "bucket": "all",
+    "status": "all"
+  },
+  "bucketOptions": [
+    { "label": "All", "value": "all" },
+    { "label": "Current", "value": "Current" },
+    { "label": "30 Days", "value": "30 Days" },
+    { "label": "60 Days", "value": "60 Days" },
+    { "label": "90 Days", "value": "90 Days" },
+    { "label": "120+ Days", "value": "120+ Days" },
+    { "label": "Uncollectible", "value": "Uncollectible" }
+  ],
+  "statusOptions": [
+    { "label": "All", "value": "all" },
+    { "label": "Paid", "value": "Paid" },
+    { "label": "Overdue", "value": "Overdue" },
+    { "label": "120+ Days", "value": "120+ Days" },
+    { "label": "Pending Review", "value": "Pending Review" }
+  ],
+  "summaryMetrics": [
+    { "label": "Total AR", "value": "$184,220" },
+    { "label": "Over 90", "value": "$46,750" },
+    { "label": "High risk", "value": "10 invoices" },
+    { "label": "Collections", "value": "87%" }
+  ]
+}

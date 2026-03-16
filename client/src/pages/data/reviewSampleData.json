@@ -16,7 +16,8 @@
       "user": "Alex P.",
       "submittedAt": "Today 08:42",
       "change": "Received amount $0.00 -> $320.00",
-      "status": { "label": "Ready", "tone": "accent" }
+      "status": { "label": "Approved", "tone": "success" },
+      "reviewedAt": "Today 09:05"
     },
     {
       "id": "REV-111",
@@ -25,7 +26,9 @@
       "user": "Dana R.",
       "submittedAt": "Yesterday 16:09",
       "change": "Category: Ops / Amount: $265.00",
-      "status": { "label": "Queued", "tone": "muted" }
+      "status": { "label": "Denied", "tone": "danger" },
+      "denialNote": "Missing receipt image and vendor confirmation.",
+      "reviewedAt": "Yesterday 16:42"
     }
   ],
   "diffById": {
