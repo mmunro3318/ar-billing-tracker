@@ -1,77 +1,90 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AppShell from '../components/shell/AppShell'
 import Button from '../components/primitives/Button'
-import Badge from '../components/primitives/Badge'
 import Surface from '../components/primitives/Surface'
 import DataTable from '../components/data-display/DataTable'
 import SectionContainer from '../components/composition/SectionContainer'
-import StatCard from '../components/data-display/StatCard'
+import MetricsGrid from '../components/composition/MetricsGrid'
 import DetailList from '../components/composition/DetailList'
-import Timeline from '../components/data-display/Timeline'
-import cashFlowReportData from './data/cashFlowReportData.json'
+import { TextInput } from '../components/primitives/Fields'
 import pageCopy from './data/pageCopy.json'
 import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
-import { normalizeCashFlowReportData } from '../utils/sampleDataContracts'
+import { fetchJson } from '../utils/apiClient'
 
-const reportData = normalizeCashFlowReportData(cashFlowReportData)
 const page = normalizePageCopy('cashFlowReport', pageCopy)
 const shellBrandTitle = getShellBrandTitle(pageCopy)
-const fallbackStatus = { label: 'Unknown', tone: 'muted' }
 
-function CashFlowReportPage({ shell }) {
-  const [periodFilter, setPeriodFilter] = useState(reportData.filters.period)
-  const [categoryFilter, setCategoryFilter] = useState(reportData.filters.category)
-  const [selectedRowId, setSelectedRowId] = useState(reportData.transactionRows[0]?.id)
-
-  const filteredRows = useMemo(() => reportData.transactionRows.filter((row) => {
-    const periodMatch = periodFilter === 'all' || row.period === periodFilter
-    const categoryMatch = categoryFilter === 'all' || row.category === categoryFilter
-    return periodMatch && categoryMatch
-  }), [categoryFilter, periodFilter])
-
-  const selectedRow = useMemo(
-    () => filteredRows.find((row) => row.id === selectedRowId) ?? filteredRows[0],
-    [filteredRows, selectedRowId],
-  )
-
-  const columns = [
-    { key: 'date', label: 'Date' },
-    { key: 'description', label: 'Description' },
-    { key: 'category', label: 'Category' },
+const FALLBACK = {
+  reportType: 'cash-flow',
+  title: 'Cash Flow Summary Report',
+  generatedAt: new Date().toISOString(),
+  summary: [],
+  columns: [
+    { key: 'period', label: 'Period' },
     { key: 'inflow', label: 'Inflow', align: 'right', mono: true },
     { key: 'outflow', label: 'Outflow', align: 'right', mono: true },
     { key: 'net', label: 'Net', align: 'right', mono: true },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (row) => {
-        const status = row?.status ?? fallbackStatus
-        return <Badge tone={status.tone}>{status.label}</Badge>
-      },
-    },
-  ]
+  ],
+  rows: [],
+}
+
+function CashFlowReportPage({ shell }) {
+  const [reportData, setReportData] = useState(FALLBACK)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [fromDate, setFromDate] = useState('')
+  const [toDate, setToDate] = useState('')
+  const [selectedRowId, setSelectedRowId] = useState('')
+
+  const loadReport = (from, to) => {
+    setIsLoading(true)
+    setLoadError('')
+    const params = new URLSearchParams({ type: 'cash-flow' })
+    if (from) params.set('from', from)
+    if (to) params.set('to', to)
+    fetchJson(`/api/reports/generate?${params.toString()}`)
+      .then((data) => {
+        setReportData(data)
+        setSelectedRowId(data.rows?.[0]?.id ?? '')
+      })
+      .catch(() => {
+        setLoadError('Live data unavailable. Showing empty report.')
+        setReportData(FALLBACK)
+      })
+      .finally(() => setIsLoading(false))
+  }
+
+  useEffect(() => {
+    fetchJson('/api/reports/generate?type=cash-flow')
+      .then((data) => {
+        setReportData(data)
+        setSelectedRowId(data.rows?.[0]?.id ?? '')
+      })
+      .catch(() => setLoadError('Live data unavailable. Showing empty report.'))
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  const selectedRow = useMemo(
+    () => reportData.rows.find((row) => row.id === selectedRowId) ?? reportData.rows[0],
+    [reportData.rows, selectedRowId],
+  )
 
   const detailPanel = {
     title: page.detailPanel.title,
     subtitle: page.detailPanel.subtitle,
     content: (
-      <>
-        <Surface compact glass title={page.detailPanel.summaryTitle} eyebrow={selectedRow?.id ?? page.detailPanel.summaryEyebrow}>
-          <DetailList
-            items={[
-              { label: 'Date', value: selectedRow?.date ?? 'N/A' },
-              { label: 'Category', value: selectedRow?.category ?? 'N/A' },
-              { label: 'Inflow', value: selectedRow?.inflow ?? '$0.00' },
-              { label: 'Outflow', value: selectedRow?.outflow ?? '$0.00' },
-            ]}
-          />
-        </Surface>
-        <Timeline
-          description={page.detailPanel.timelineDescription}
-          items={reportData.timelineItems}
-          title={page.detailPanel.timelineTitle}
+      <Surface compact glass title={page.detailPanel.summaryTitle} eyebrow={selectedRow?.period ?? page.detailPanel.summaryEyebrow}>
+        <DetailList
+          items={selectedRow
+            ? [
+                { label: 'Period', value: selectedRow.period },
+                { label: 'Inflow', value: selectedRow.inflow },
+                { label: 'Outflow', value: selectedRow.outflow },
+                { label: 'Net', value: selectedRow.net },
+              ]
+            : [{ label: 'State', value: 'No row selected' }]}
         />
-      </>
+      </Surface>
     ),
   }
 
@@ -90,45 +103,33 @@ function CashFlowReportPage({ shell }) {
             <p className="page-copy">{page.topBar.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">{filteredRows.length} rows</span>
+            <span className="page-badge">{isLoading ? 'Loading...' : `${reportData.rows.length} periods`}</span>
             <Button size="sm" variant="secondary">Export</Button>
           </div>
         </header>
       }
     >
       <div className="page-stack">
+        {loadError ? <p className="page-copy">{loadError}</p> : null}
         <SectionContainer eyebrow={page.sections.metrics.eyebrow} title={page.sections.metrics.title}>
-          <div className="section-grid section-grid--stats">
-            {reportData.flowMetrics.map((card) => (
-              <StatCard key={card.title} {...card} />
-            ))}
-          </div>
+          {reportData.summary.length > 0 && <MetricsGrid items={reportData.summary} />}
         </SectionContainer>
 
         <SectionContainer eyebrow={page.sections.transactions.eyebrow} title={page.sections.transactions.title}>
           <DataTable
             actions={
               <div className="toolbar-group">
-                <label className="field-shell">
-                  <span className="field-label"><span>Period</span></span>
-                  <select className="field-control" value={periodFilter} onChange={(event) => setPeriodFilter(event.target.value)}>
-                    {reportData.periodOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                </label>
-                <label className="field-shell">
-                  <span className="field-label"><span>Category</span></span>
-                  <select className="field-control" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-                    {reportData.categoryOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </select>
-                </label>
-                <Button size="sm" variant="ghost" onClick={() => { setPeriodFilter('month'); setCategoryFilter('all') }}>Reset</Button>
+                <TextInput label="From" type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} />
+                <TextInput label="To" type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
+                <Button size="sm" onClick={() => loadReport(fromDate, toDate)} disabled={isLoading}>Load</Button>
+                <Button size="sm" variant="ghost" onClick={() => { setFromDate(''); setToDate(''); loadReport('', '') }}>Reset</Button>
               </div>
             }
-            columns={columns}
+            columns={reportData.columns}
             description={page.sections.transactions.tableDescription}
             onRowClick={setSelectedRowId}
             rowSelectionEnabled
-            rows={filteredRows}
+            rows={reportData.rows}
             selectedRowId={selectedRow?.id}
             title={page.sections.transactions.tableTitle}
           />
