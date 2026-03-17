@@ -10,9 +10,12 @@ import AuditLogPage from './pages/AuditLogPage'
 import PreviewPage from './pages/PreviewPage'
 import NewClientPage from './pages/NewClientPage'
 import InvoiceFormPage from './pages/InvoiceFormPage'
+import ExpenseFormPage from './pages/ExpenseFormPage'
+import PaymentFormPage from './pages/PaymentFormPage'
 import ClientDetailPage from './pages/ClientDetailPage'
 import AgingSummaryReportPage from './pages/AgingSummaryReportPage'
 import CashFlowReportPage from './pages/CashFlowReportPage'
+import ReportsPage from './pages/ReportsPage'
 import { DEFAULT_PATH, NAV_ITEMS, getActiveNavKey } from './routes/appRoutes'
 
 function RoutedApp() {
@@ -38,6 +41,9 @@ function RoutedApp() {
       <Route path="/audit" element={<AuditLogPage shell={shell} />} />
       <Route path="/forms/new-client" element={<NewClientPage shell={shell} />} />
       <Route path="/forms/invoices" element={<InvoiceFormPage shell={shell} />} />
+      <Route path="/forms/expenses" element={<ExpenseFormPage shell={shell} />} />
+      <Route path="/forms/payments" element={<PaymentFormPage shell={shell} />} />
+      <Route path="/reports" element={<ReportsPage shell={shell} />} />
       <Route path="/reports/aging-summary" element={<AgingSummaryReportPage shell={shell} />} />
       <Route path="/reports/cash-flow" element={<CashFlowReportPage shell={shell} />} />
       <Route path="/preview" element={<PreviewPage shell={shell} />} />

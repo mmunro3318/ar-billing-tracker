@@ -14,7 +14,9 @@
       "meta": "Entry",
       "children": [
         { "key": "forms-new-client", "path": "/forms/new-client", "label": "New Client", "meta": "Client" },
-        { "key": "forms-invoices", "path": "/forms/invoices", "label": "Invoice Form", "meta": "Invoice" }
+        { "key": "forms-invoices", "path": "/forms/invoices", "label": "Invoice Form", "meta": "Invoice" },
+        { "key": "forms-expenses", "path": "/forms/expenses", "label": "Expense Form", "meta": "Expense" },
+        { "key": "forms-payments", "path": "/forms/payments", "label": "Payment Form", "meta": "Payment" }
       ]
     },
     {
@@ -23,6 +25,7 @@
       "label": "Reports",
       "meta": "Insights",
       "children": [
+        { "key": "reports-builder", "path": "/reports", "label": "Report Builder", "meta": "Build" },
         { "key": "reports-aging-summary", "path": "/reports/aging-summary", "label": "Aging Summary", "meta": "Aging" },
         { "key": "reports-cash-flow", "path": "/reports/cash-flow", "label": "Cash Flow", "meta": "Cash" }
       ]

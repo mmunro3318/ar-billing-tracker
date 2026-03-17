@@ -246,6 +246,34 @@ function formatDurationFromHours(totalHours) {
   return `${hours}h ${String(minutes).padStart(2, "0")}m`;
 }
 
+function normalizeReportType(value) {
+  const key = String(value || "cash-flow").toLowerCase();
+  if (key === "cash-flow" || key === "ar-summary" || key === "client-summary" || key === "expense-summary") {
+    return key;
+  }
+
+  return "cash-flow";
+}
+
+function asIsoDateOrNull(value) {
+  const parsed = toIsoDate(value);
+  return parsed || null;
+}
+
+function buildCategoryCode(name) {
+  const token = String(name || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 18);
+
+  const suffix = Math.floor(Date.now() % 10000)
+    .toString()
+    .padStart(4, "0");
+
+  return `TAG-${token || "CUSTOM"}-${suffix}`;
+}
+
 function normalizeWeekRows(rawRows) {
   return rawRows
     .sort((a, b) => String(a.period_date).localeCompare(String(b.period_date)))
@@ -790,6 +818,298 @@ app.get("/api/dashboard", (_req, res) => {
   });
 });
 
+app.get("/api/invoices/options", (req, res) => {
+  ensureInvoicesExist();
+
+  const clientCode = String(req.query.clientCode || "").trim() || null;
+  const rows = db.prepare(`
+    SELECT
+      i.invoice_code,
+      i.client_id,
+      i.outstanding_amount_cents,
+      i.date_billed,
+      c.client_code,
+      c.name AS client_name
+    FROM invoices i
+    INNER JOIN clients c ON c.id = i.client_id
+    WHERE i.outstanding_amount_cents > 0
+      AND (? IS NULL OR c.client_code = ?)
+    ORDER BY i.date_billed DESC, i.id DESC
+    LIMIT 200
+  `).all(clientCode, clientCode);
+
+  const options = rows.map((row) => ({
+    value: row.invoice_code,
+    clientCode: row.client_code,
+    label: `${row.invoice_code} / ${row.client_name} / ${formatCurrency(row.outstanding_amount_cents)}`,
+    outstandingAmount: formatCurrency(row.outstanding_amount_cents),
+    dateBilled: asDateLabel(row.date_billed),
+  }));
+
+  res.status(200).json({ options });
+});
+
+app.get("/api/expense-tags", (_req, res) => {
+  const rows = db.prepare(`
+    SELECT category_code, name
+    FROM expense_categories
+    WHERE is_active = 1
+    ORDER BY name COLLATE NOCASE ASC
+  `).all();
+
+  const tags = rows.map((row) => ({
+    value: row.category_code,
+    label: row.name,
+  }));
+
+  res.status(200).json({ tags });
+});
+
+app.post("/api/expense-tags", (req, res) => {
+  const name = String(req.body?.name || "").trim();
+  if (!name) {
+    res.status(400).json({ error: "Tag name is required." });
+    return;
+  }
+
+  const existing = db.prepare(`
+    SELECT category_code, name
+    FROM expense_categories
+    WHERE lower(name) = lower(?)
+    LIMIT 1
+  `).get(name);
+
+  if (existing) {
+    res.status(200).json({
+      tag: { value: existing.category_code, label: existing.name },
+      existed: true,
+    });
+    return;
+  }
+
+  const categoryCode = buildCategoryCode(name);
+  db.prepare(`
+    INSERT INTO expense_categories (
+      category_code,
+      name,
+      description,
+      is_active,
+      created_by_user_id
+    ) VALUES (?, ?, ?, 1, 1)
+  `).run(categoryCode, name, `${name} expenses`);
+
+  res.status(201).json({
+    tag: { value: categoryCode, label: name },
+    existed: false,
+  });
+});
+
+app.get("/api/reports/generate", (req, res) => {
+  ensureInvoicesExist();
+
+  const reportType = normalizeReportType(req.query.type);
+  const fromDate = asIsoDateOrNull(req.query.from);
+  const toDate = asIsoDateOrNull(req.query.to);
+
+  if (reportType === "cash-flow") {
+    const rows = db.prepare(`
+      WITH inflow AS (
+        SELECT date(payment_date, 'start of month') AS period_date, SUM(amount_received_cents) AS cents
+        FROM payments
+        WHERE (? IS NULL OR date(payment_date) >= date(?))
+          AND (? IS NULL OR date(payment_date) <= date(?))
+        GROUP BY period_date
+      ),
+      outflow AS (
+        SELECT date(expense_date, 'start of month') AS period_date, SUM(amount_cents) AS cents
+        FROM expenses
+        WHERE (? IS NULL OR date(expense_date) >= date(?))
+          AND (? IS NULL OR date(expense_date) <= date(?))
+        GROUP BY period_date
+      ),
+      periods AS (
+        SELECT period_date FROM inflow
+        UNION
+        SELECT period_date FROM outflow
+      )
+      SELECT
+        periods.period_date,
+        COALESCE(inflow.cents, 0) AS inflow_cents,
+        COALESCE(outflow.cents, 0) AS outflow_cents
+      FROM periods
+      LEFT JOIN inflow ON inflow.period_date = periods.period_date
+      LEFT JOIN outflow ON outflow.period_date = periods.period_date
+      ORDER BY periods.period_date ASC
+    `).all(fromDate, fromDate, toDate, toDate, fromDate, fromDate, toDate, toDate);
+
+    const mappedRows = rows.map((row, index) => ({
+      id: `cf-${index + 1}`,
+      period: toPeriodLabel(row.period_date, { month: "short", year: "numeric" }),
+      inflow: formatCurrency(row.inflow_cents),
+      outflow: formatCurrency(row.outflow_cents),
+      net: formatCurrency(Number(row.inflow_cents || 0) - Number(row.outflow_cents || 0)),
+    }));
+
+    const totalInflow = rows.reduce((sum, row) => sum + Number(row.inflow_cents || 0), 0);
+    const totalOutflow = rows.reduce((sum, row) => sum + Number(row.outflow_cents || 0), 0);
+
+    res.status(200).json({
+      reportType,
+      title: "Cash Flow Summary Report",
+      generatedAt: new Date().toISOString(),
+      summary: [
+        { label: "Total inflow", value: formatCurrency(totalInflow) },
+        { label: "Total outflow", value: formatCurrency(totalOutflow) },
+        { label: "Net", value: formatCurrency(totalInflow - totalOutflow) },
+      ],
+      columns: [
+        { key: "period", label: "Period" },
+        { key: "inflow", label: "Inflow", align: "right", mono: true },
+        { key: "outflow", label: "Outflow", align: "right", mono: true },
+        { key: "net", label: "Net", align: "right", mono: true },
+      ],
+      rows: mappedRows,
+    });
+    return;
+  }
+
+  if (reportType === "ar-summary") {
+    const rows = db.prepare(`
+      SELECT
+        aging_bucket,
+        COUNT(*) AS invoice_count,
+        COALESCE(SUM(billed_amount_cents), 0) AS billed_cents,
+        COALESCE(SUM(received_amount_cents), 0) AS received_cents,
+        COALESCE(SUM(outstanding_amount_cents), 0) AS outstanding_cents
+      FROM invoices
+      WHERE (? IS NULL OR date(date_billed) >= date(?))
+        AND (? IS NULL OR date(date_billed) <= date(?))
+      GROUP BY aging_bucket
+      ORDER BY outstanding_cents DESC
+    `).all(fromDate, fromDate, toDate, toDate);
+
+    const mappedRows = rows.map((row, index) => ({
+      id: `ar-${index + 1}`,
+      bucket: getBucketConfig(row.aging_bucket).label,
+      invoices: String(row.invoice_count || 0),
+      billed: formatCurrency(row.billed_cents),
+      received: formatCurrency(row.received_cents),
+      outstanding: formatCurrency(row.outstanding_cents),
+    }));
+
+    const totalOutstanding = rows.reduce((sum, row) => sum + Number(row.outstanding_cents || 0), 0);
+    const totalInvoices = rows.reduce((sum, row) => sum + Number(row.invoice_count || 0), 0);
+
+    res.status(200).json({
+      reportType,
+      title: "AR Summary Report",
+      generatedAt: new Date().toISOString(),
+      summary: [
+        { label: "Invoices", value: String(totalInvoices) },
+        { label: "Outstanding AR", value: formatCurrency(totalOutstanding) },
+      ],
+      columns: [
+        { key: "bucket", label: "Aging bucket" },
+        { key: "invoices", label: "Invoices", align: "right", mono: true },
+        { key: "billed", label: "Billed", align: "right", mono: true },
+        { key: "received", label: "Received", align: "right", mono: true },
+        { key: "outstanding", label: "Outstanding", align: "right", mono: true },
+      ],
+      rows: mappedRows,
+    });
+    return;
+  }
+
+  if (reportType === "client-summary") {
+    const rows = db.prepare(`
+      SELECT
+        c.client_code,
+        c.name,
+        c.status,
+        COALESCE(COUNT(i.id), 0) AS invoice_count,
+        COALESCE(SUM(i.received_amount_cents), 0) AS received_cents,
+        COALESCE(SUM(i.outstanding_amount_cents), 0) AS outstanding_cents
+      FROM clients c
+      LEFT JOIN invoices i ON i.client_id = c.id
+        AND (? IS NULL OR date(i.date_billed) >= date(?))
+        AND (? IS NULL OR date(i.date_billed) <= date(?))
+      GROUP BY c.id
+      ORDER BY outstanding_cents DESC, c.name COLLATE NOCASE ASC
+    `).all(fromDate, fromDate, toDate, toDate);
+
+    const mappedRows = rows.map((row) => ({
+      id: row.client_code,
+      client: row.name,
+      status: mapClientStatus(row.status).label,
+      invoices: String(row.invoice_count || 0),
+      received: formatCurrency(row.received_cents),
+      outstanding: formatCurrency(row.outstanding_cents),
+    }));
+
+    const totalOutstanding = rows.reduce((sum, row) => sum + Number(row.outstanding_cents || 0), 0);
+
+    res.status(200).json({
+      reportType,
+      title: "Client Summary Report",
+      generatedAt: new Date().toISOString(),
+      summary: [
+        { label: "Clients", value: String(rows.length) },
+        { label: "Outstanding AR", value: formatCurrency(totalOutstanding) },
+      ],
+      columns: [
+        { key: "client", label: "Client" },
+        { key: "status", label: "Status" },
+        { key: "invoices", label: "Invoices", align: "right", mono: true },
+        { key: "received", label: "Received", align: "right", mono: true },
+        { key: "outstanding", label: "Outstanding", align: "right", mono: true },
+      ],
+      rows: mappedRows,
+    });
+    return;
+  }
+
+  const rows = db.prepare(`
+    SELECT
+      ec.name AS category,
+      COUNT(e.id) AS expense_count,
+      COALESCE(SUM(e.amount_cents), 0) AS amount_cents,
+      MAX(e.expense_date) AS last_expense_date
+    FROM expenses e
+    INNER JOIN expense_categories ec ON ec.id = e.category_id
+    WHERE (? IS NULL OR date(e.expense_date) >= date(?))
+      AND (? IS NULL OR date(e.expense_date) <= date(?))
+    GROUP BY ec.id
+    ORDER BY amount_cents DESC, ec.name COLLATE NOCASE ASC
+  `).all(fromDate, fromDate, toDate, toDate);
+
+  const mappedRows = rows.map((row, index) => ({
+    id: `exp-${index + 1}`,
+    category: row.category,
+    entries: String(row.expense_count || 0),
+    amount: formatCurrency(row.amount_cents),
+    lastExpense: asDateLabel(row.last_expense_date),
+  }));
+
+  const totalAmount = rows.reduce((sum, row) => sum + Number(row.amount_cents || 0), 0);
+
+  res.status(200).json({
+    reportType,
+    title: "Expense Summary Report",
+    generatedAt: new Date().toISOString(),
+    summary: [
+      { label: "Expense entries", value: String(rows.reduce((sum, row) => sum + Number(row.expense_count || 0), 0)) },
+      { label: "Total spend", value: formatCurrency(totalAmount) },
+    ],
+    columns: [
+      { key: "category", label: "Tag" },
+      { key: "entries", label: "Entries", align: "right", mono: true },
+      { key: "amount", label: "Amount", align: "right", mono: true },
+      { key: "lastExpense", label: "Last expense" },
+    ],
+    rows: mappedRows,
+  });
+});
+
 app.get("/api/clients/options", (_req, res) => {
   const rows = db.prepare(`
     SELECT client_code, name, contact_name
@@ -1088,6 +1408,42 @@ app.post("/api/payments", (req, res) => {
     payload.notes || null,
   );
 
+  const invoiceCode = String(payload.invoiceCode || "").trim();
+  if (invoiceCode) {
+    const invoiceRow = db.prepare(`
+      SELECT id, billed_amount_cents, received_amount_cents
+      FROM invoices
+      WHERE invoice_code = ?
+      LIMIT 1
+    `).get(invoiceCode);
+
+    if (invoiceRow) {
+      const paymentRow = db.prepare("SELECT id FROM payments WHERE payment_code = ?").get(paymentCode);
+      const requestedApplyCents = toCents(payload.amountApplied || payload.amountReceived);
+      const outstandingCents = Math.max(0, Number(invoiceRow.billed_amount_cents || 0) - Number(invoiceRow.received_amount_cents || 0));
+      const amountAppliedCents = Math.max(0, Math.min(requestedApplyCents || amountCents, outstandingCents));
+
+      if (paymentRow?.id && amountAppliedCents > 0) {
+        db.prepare(`
+          INSERT INTO invoice_payments (
+            invoice_id,
+            payment_id,
+            amount_applied_cents,
+            created_by_user_id
+          ) VALUES (?, ?, ?, 1)
+        `).run(invoiceRow.id, paymentRow.id, amountAppliedCents);
+
+        db.prepare(`
+          UPDATE invoices
+          SET
+            received_amount_cents = received_amount_cents + ?,
+            updated_by_user_id = 1
+          WHERE id = ?
+        `).run(amountAppliedCents, invoiceRow.id);
+      }
+    }
+  }
+
   res.status(201).json({
     payment: {
       id: paymentCode,
@@ -1109,7 +1465,10 @@ app.post("/api/expenses", (req, res) => {
     return;
   }
 
-  const categoryIdRow = db.prepare("SELECT id FROM expense_categories ORDER BY id ASC LIMIT 1").get();
+  const requestedCategoryCode = String(payload.categoryCode || payload.tag || "").trim();
+  const categoryIdRow = requestedCategoryCode
+    ? db.prepare("SELECT id FROM expense_categories WHERE category_code = ? LIMIT 1").get(requestedCategoryCode)
+    : db.prepare("SELECT id FROM expense_categories ORDER BY id ASC LIMIT 1").get();
   const nextId = Number(db.prepare("SELECT IFNULL(MAX(id), 0) AS max_id FROM expenses").get().max_id) + 1;
   const expenseCode = payload.expenseCode || `EXP-MAN-${String(nextId).padStart(4, "0")}`;
 
