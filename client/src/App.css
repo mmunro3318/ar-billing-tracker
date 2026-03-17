@@ -693,6 +693,45 @@ textarea.field-control {
   color: var(--warning);
 }
 
+.dashboard-chart-surface {
+  min-height: 100%;
+}
+
+.dashboard-chart {
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(124, 146, 254, 0.16);
+  background: linear-gradient(180deg, rgba(37, 43, 66, 0.78), rgba(26, 30, 46, 0.75));
+}
+
+.dashboard-chart--drilldown {
+  margin-top: 2px;
+}
+
+.dashboard-chart-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.dashboard-chart-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dashboard-chart-control-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dashboard-chart-control-row--dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .mini-bar {
   height: 8px;
   border-radius: 999px;
@@ -976,6 +1015,10 @@ textarea.field-control {
 
   .button-row,
   .badge-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-chart-control-row--dates {
     grid-template-columns: 1fr;
   }
 }

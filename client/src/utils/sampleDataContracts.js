@@ -13,6 +13,21 @@ function asString(value, fallback = '') {
   return typeof value === 'string' ? value : fallback
 }
 
+function asNumber(value, fallback = 0) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const normalized = Number(value.replace(/[^0-9.-]/g, ''))
+    if (Number.isFinite(normalized)) {
+      return normalized
+    }
+  }
+
+  return fallback
+}
+
 function asTone(value, fallback = 'muted') {
   return VALID_TONES.has(value) ? value : fallback
 }
@@ -80,6 +95,79 @@ function normalizeAgingBucket(item, index) {
     share: asString(bucket.share, '0%'),
     tone: asTone(bucket.tone, 'muted'),
   }
+}
+
+function normalizeBucketKey(value, fallback = 'bucket') {
+  const normalized = String(value ?? fallback)
+    .toLowerCase()
+    .replace('120+', '120-plus')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return normalized || fallback
+}
+
+function normalizeDashboardAgingVisualBucket(item, index) {
+  const bucket = asObject(item)
+  const label = asString(bucket.bucket, `Bucket ${index + 1}`)
+
+  return {
+    bucket: label,
+    bucketKey: asString(bucket.bucketKey, normalizeBucketKey(label, `bucket-${index + 1}`)),
+    paymentsReceived: asNumber(bucket.paymentsReceived, 0),
+    totalInvoiceAmount: asNumber(bucket.totalInvoiceAmount, 0),
+  }
+}
+
+function normalizeDashboardClientBreakdownRow(item, index) {
+  const row = asObject(item)
+  return {
+    client: asString(row.client, `Client ${index + 1}`),
+    paymentsReceived: asNumber(row.paymentsReceived, 0),
+    totalInvoiceAmount: asNumber(row.totalInvoiceAmount, 0),
+  }
+}
+
+function normalizeDashboardClientBreakdown(rawBreakdown, fallbackBuckets) {
+  const breakdown = asObject(rawBreakdown)
+  const normalized = {}
+
+  Object.keys(breakdown).forEach((key) => {
+    normalized[key] = asArray(breakdown[key]).map(normalizeDashboardClientBreakdownRow)
+  })
+
+  if (Object.keys(normalized).length) {
+    return normalized
+  }
+
+  const fallback = {}
+  asArray(fallbackBuckets).forEach((bucket) => {
+    fallback[bucket.bucketKey] = []
+  })
+
+  return fallback
+}
+
+function normalizeDashboardCashFlowRow(item, index) {
+  const row = asObject(item)
+  return {
+    label: asString(row.label, `Point ${index + 1}`),
+    date: asString(row.date, ''),
+    inflow: asNumber(row.inflow, 0),
+    outflow: asNumber(row.outflow, 0),
+    net: asNumber(row.net, 0),
+  }
+}
+
+function normalizeDashboardCashFlowByPeriod(rawCashFlow) {
+  const cashFlow = asObject(rawCashFlow)
+  const normalized = {}
+
+  Object.keys(cashFlow).forEach((periodKey) => {
+    normalized[periodKey] = asArray(cashFlow[periodKey]).map(normalizeDashboardCashFlowRow)
+  })
+
+  return normalized
 }
 
 function normalizeInvoiceRow(item, index) {
@@ -178,11 +266,16 @@ function normalizeDiffLookup(rawLookup, prefix) {
 
 export function normalizeDashboardSampleData(rawData) {
   const data = asObject(rawData)
+  const normalizedAgingVisualBuckets = asArray(data.agingVisualBuckets).map(normalizeDashboardAgingVisualBucket)
+
   return {
     agingBuckets: asArray(data.agingBuckets).map(normalizeAgingBucket),
     heroMetrics: asArray(data.heroMetrics).map(normalizeMetric),
     statCards: asArray(data.statCards).map(normalizeStatCard),
     timelineItems: asArray(data.timelineItems).map(normalizeTimelineItem),
+    agingVisualBuckets: normalizedAgingVisualBuckets,
+    bucketClientBreakdown: normalizeDashboardClientBreakdown(data.bucketClientBreakdown, normalizedAgingVisualBuckets),
+    cashFlowByPeriod: normalizeDashboardCashFlowByPeriod(data.cashFlowByPeriod),
   }
 }
 

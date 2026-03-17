@@ -39,6 +39,90 @@
     { "label": "120+ Days", "value": "$15,940", "count": 6, "share": "9%", "tone": "danger" },
     { "label": "Uncollectible", "value": "$8,940", "count": 4, "share": "5%", "tone": "muted" }
   ],
+  "agingVisualBuckets": [
+    { "bucket": "Current", "bucketKey": "current", "paymentsReceived": 45120, "totalInvoiceAmount": 58110 },
+    { "bucket": "30 Days", "bucketKey": "30-days", "paymentsReceived": 26830, "totalInvoiceAmount": 42380 },
+    { "bucket": "60 Days", "bucketKey": "60-days", "paymentsReceived": 17340, "totalInvoiceAmount": 36920 },
+    { "bucket": "90 Days", "bucketKey": "90-days", "paymentsReceived": 9020, "totalInvoiceAmount": 21870 },
+    { "bucket": "120+ Days", "bucketKey": "120-plus-days", "paymentsReceived": 4660, "totalInvoiceAmount": 15940 },
+    { "bucket": "Uncollectible", "bucketKey": "uncollectible", "paymentsReceived": 1180, "totalInvoiceAmount": 8940 }
+  ],
+  "bucketClientBreakdown": {
+    "current": [
+      { "client": "BlueCross", "paymentsReceived": 13780, "totalInvoiceAmount": 16230 },
+      { "client": "Aetna", "paymentsReceived": 10940, "totalInvoiceAmount": 14120 },
+      { "client": "United", "paymentsReceived": 9600, "totalInvoiceAmount": 13210 },
+      { "client": "Medicare", "paymentsReceived": 10800, "totalInvoiceAmount": 14550 }
+    ],
+    "30-days": [
+      { "client": "BlueCross", "paymentsReceived": 8690, "totalInvoiceAmount": 13640 },
+      { "client": "Aetna", "paymentsReceived": 6350, "totalInvoiceAmount": 9710 },
+      { "client": "United", "paymentsReceived": 5170, "totalInvoiceAmount": 8310 },
+      { "client": "Medicare", "paymentsReceived": 6620, "totalInvoiceAmount": 10720 }
+    ],
+    "60-days": [
+      { "client": "BlueCross", "paymentsReceived": 5720, "totalInvoiceAmount": 11340 },
+      { "client": "Aetna", "paymentsReceived": 4450, "totalInvoiceAmount": 8750 },
+      { "client": "United", "paymentsReceived": 3650, "totalInvoiceAmount": 7920 },
+      { "client": "Medicare", "paymentsReceived": 3520, "totalInvoiceAmount": 8910 }
+    ],
+    "90-days": [
+      { "client": "BlueCross", "paymentsReceived": 2860, "totalInvoiceAmount": 7310 },
+      { "client": "Aetna", "paymentsReceived": 2410, "totalInvoiceAmount": 5630 },
+      { "client": "United", "paymentsReceived": 1930, "totalInvoiceAmount": 4500 },
+      { "client": "Medicare", "paymentsReceived": 1820, "totalInvoiceAmount": 4430 }
+    ],
+    "120-plus-days": [
+      { "client": "BlueCross", "paymentsReceived": 1530, "totalInvoiceAmount": 5100 },
+      { "client": "Aetna", "paymentsReceived": 1280, "totalInvoiceAmount": 4030 },
+      { "client": "United", "paymentsReceived": 920, "totalInvoiceAmount": 3520 },
+      { "client": "Medicare", "paymentsReceived": 930, "totalInvoiceAmount": 3290 }
+    ],
+    "uncollectible": [
+      { "client": "BlueCross", "paymentsReceived": 420, "totalInvoiceAmount": 2610 },
+      { "client": "Aetna", "paymentsReceived": 310, "totalInvoiceAmount": 2140 },
+      { "client": "United", "paymentsReceived": 210, "totalInvoiceAmount": 1860 },
+      { "client": "Medicare", "paymentsReceived": 240, "totalInvoiceAmount": 2330 }
+    ]
+  },
+  "cashFlowByPeriod": {
+    "month": [
+      { "label": "W1", "date": "2026-03-03", "inflow": 14820, "outflow": 7420, "net": 7400 },
+      { "label": "W2", "date": "2026-03-10", "inflow": 16250, "outflow": 8140, "net": 8110 },
+      { "label": "W3", "date": "2026-03-17", "inflow": 17410, "outflow": 9320, "net": 8090 },
+      { "label": "W4", "date": "2026-03-24", "inflow": 14000, "outflow": 7810, "net": 6190 }
+    ],
+    "30d": [
+      { "label": "Feb 20", "date": "2026-02-20", "inflow": 11810, "outflow": 6420, "net": 5390 },
+      { "label": "Feb 27", "date": "2026-02-27", "inflow": 13220, "outflow": 7110, "net": 6110 },
+      { "label": "Mar 06", "date": "2026-03-06", "inflow": 14510, "outflow": 7230, "net": 7280 },
+      { "label": "Mar 13", "date": "2026-03-13", "inflow": 15920, "outflow": 8020, "net": 7900 },
+      { "label": "Mar 17", "date": "2026-03-17", "inflow": 12640, "outflow": 6580, "net": 6060 }
+    ],
+    "60d": [
+      { "label": "Jan", "date": "2026-01-31", "inflow": 48220, "outflow": 30140, "net": 18080 },
+      { "label": "Feb", "date": "2026-02-28", "inflow": 51780, "outflow": 32440, "net": 19340 },
+      { "label": "Mar", "date": "2026-03-31", "inflow": 62480, "outflow": 39620, "net": 22860 }
+    ],
+    "90d": [
+      { "label": "Dec", "date": "2025-12-31", "inflow": 45320, "outflow": 29950, "net": 15370 },
+      { "label": "Jan", "date": "2026-01-31", "inflow": 48220, "outflow": 30140, "net": 18080 },
+      { "label": "Feb", "date": "2026-02-28", "inflow": 51780, "outflow": 32440, "net": 19340 },
+      { "label": "Mar", "date": "2026-03-31", "inflow": 62480, "outflow": 39620, "net": 22860 }
+    ],
+    "quarter": [
+      { "label": "Q2 2025", "date": "2025-06-30", "inflow": 139410, "outflow": 91320, "net": 48090 },
+      { "label": "Q3 2025", "date": "2025-09-30", "inflow": 147860, "outflow": 94610, "net": 53250 },
+      { "label": "Q4 2025", "date": "2025-12-31", "inflow": 151730, "outflow": 101420, "net": 50310 },
+      { "label": "Q1 2026", "date": "2026-03-31", "inflow": 162480, "outflow": 102200, "net": 60280 }
+    ],
+    "year": [
+      { "label": "2023", "date": "2023-12-31", "inflow": 521320, "outflow": 380120, "net": 141200 },
+      { "label": "2024", "date": "2024-12-31", "inflow": 566940, "outflow": 402810, "net": 164130 },
+      { "label": "2025", "date": "2025-12-31", "inflow": 594870, "outflow": 417350, "net": 177520 },
+      { "label": "2026", "date": "2026-12-31", "inflow": 162480, "outflow": 102200, "net": 60280 }
+    ]
+  },
   "timelineItems": [
     {
       "id": 1,

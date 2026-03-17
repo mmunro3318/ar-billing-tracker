@@ -8,6 +8,7 @@ import MetricsGrid from '../components/composition/MetricsGrid'
 import StatCard from '../components/data-display/StatCard'
 import AgingBucketCard from '../components/domain/AgingBucketCard'
 import Timeline from '../components/data-display/Timeline'
+import DashboardVisuals from '../components/data-display/DashboardVisuals'
 import DetailList from '../components/composition/DetailList'
 import dashboardSampleData from './data/dashboardSampleData.json'
 import pageCopy from './data/pageCopy.json'
@@ -21,6 +22,9 @@ const {
   heroMetrics: dashboardHeroMetrics,
   statCards: dashboardStatCards,
   timelineItems: dashboardTimelineItems,
+  agingVisualBuckets,
+  bucketClientBreakdown,
+  cashFlowByPeriod,
 } = normalizedDashboardData
 
 const dashboardCopy = normalizePageCopy('dashboard', pageCopy)
@@ -87,6 +91,12 @@ function DashboardPage({ shell }) {
     >
       <div className="page-stack">
         <ReadOnlyModeBanner />
+
+        <DashboardVisuals
+          agingVisualBuckets={agingVisualBuckets}
+          bucketClientBreakdown={bucketClientBreakdown}
+          cashFlowByPeriod={cashFlowByPeriod}
+        />
 
         <section className="section-grid section-grid--hero">
           <Surface
