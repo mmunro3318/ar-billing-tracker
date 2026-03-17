@@ -1,10 +1,9 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppShell from '../components/shell/AppShell'
 import Button from '../components/primitives/Button'
 import Surface from '../components/primitives/Surface'
-import ReadOnlyModeBanner from '../components/domain/ReadOnlyModeBanner'
 import SectionContainer from '../components/composition/SectionContainer'
-import MetricsGrid from '../components/composition/MetricsGrid'
 import StatCard from '../components/data-display/StatCard'
 import AgingBucketCard from '../components/domain/AgingBucketCard'
 import Timeline from '../components/data-display/Timeline'
@@ -14,24 +13,58 @@ import dashboardSampleData from './data/dashboardSampleData.json'
 import pageCopy from './data/pageCopy.json'
 import { normalizeDashboardSampleData } from '../utils/sampleDataContracts'
 import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
-
-const normalizedDashboardData = normalizeDashboardSampleData(dashboardSampleData)
-
-const {
-  agingBuckets: dashboardAgingBuckets,
-  heroMetrics: dashboardHeroMetrics,
-  statCards: dashboardStatCards,
-  timelineItems: dashboardTimelineItems,
-  agingVisualBuckets,
-  bucketClientBreakdown,
-  cashFlowByPeriod,
-} = normalizedDashboardData
+import { fetchJson } from '../utils/apiClient'
 
 const dashboardCopy = normalizePageCopy('dashboard', pageCopy)
 const shellBrandTitle = getShellBrandTitle(pageCopy)
 
 function DashboardPage({ shell }) {
   const navigate = useNavigate()
+  const [dashboardData, setDashboardData] = useState(() => normalizeDashboardSampleData(dashboardSampleData))
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+
+  const {
+    agingBuckets: dashboardAgingBuckets,
+    statCards: dashboardStatCards,
+    timelineItems: dashboardTimelineItems,
+    agingVisualBuckets,
+    bucketClientBreakdown,
+    cashFlowByPeriod,
+  } = dashboardData
+
+  useEffect(() => {
+    let isActive = true
+
+    async function loadDashboard() {
+      try {
+        const payload = await fetchJson('/api/dashboard')
+        if (!isActive) {
+          return
+        }
+
+        setDashboardData(normalizeDashboardSampleData(payload))
+        setLoadError('')
+      } catch {
+        if (!isActive) {
+          return
+        }
+
+        setDashboardData(normalizeDashboardSampleData(dashboardSampleData))
+        setLoadError('Live data unavailable. Showing sample dataset.')
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadDashboard()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
 
   const detailPanel = {
     title: dashboardCopy.detailPanel.title,
@@ -73,7 +106,7 @@ function DashboardPage({ shell }) {
             <p className="page-copy">{dashboardCopy.topBar.description}</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">{dashboardCopy.topBar.badge}</span>
+            <span className="page-badge">{isLoading ? 'Loading live data...' : dashboardCopy.topBar.badge}</span>
             {dashboardCopy.topBar.actions.map((action) => (
               <Button
                 key={action.label}
@@ -90,38 +123,7 @@ function DashboardPage({ shell }) {
       }
     >
       <div className="page-stack">
-        <ReadOnlyModeBanner />
-
-        <DashboardVisuals
-          agingVisualBuckets={agingVisualBuckets}
-          bucketClientBreakdown={bucketClientBreakdown}
-          cashFlowByPeriod={cashFlowByPeriod}
-        />
-
-        <section className="section-grid section-grid--hero">
-          <Surface
-            description={dashboardCopy.hero.description}
-            eyebrow={dashboardCopy.hero.eyebrow}
-            title={dashboardCopy.hero.title}
-          >
-            <div className="button-row">
-              {dashboardCopy.hero.actions.map((action) => (
-                <Button
-                  key={action.label}
-                  leadingDot={Boolean(action.leadingDot)}
-                  onClick={() => navigate(action.path)}
-                  variant={action.variant}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </div>
-          </Surface>
-
-          <Surface glass title={dashboardCopy.heroMetrics.title} eyebrow={dashboardCopy.heroMetrics.eyebrow}>
-            <MetricsGrid items={dashboardHeroMetrics} />
-          </Surface>
-        </section>
+        {loadError ? <p className="page-copy">{loadError}</p> : null}
 
         <SectionContainer
           description={dashboardCopy.metricsSection.description}
@@ -139,6 +141,12 @@ function DashboardPage({ shell }) {
             ))}
           </div>
         </SectionContainer>
+
+        <DashboardVisuals
+          agingVisualBuckets={agingVisualBuckets}
+          bucketClientBreakdown={bucketClientBreakdown}
+          cashFlowByPeriod={cashFlowByPeriod}
+        />
 
         <section className="section-grid section-grid--timeline">
           <Timeline

@@ -202,6 +202,98 @@ function compactTimestamp(value) {
   return `${datePart} ${timePart}`;
 }
 
+const DASHBOARD_BUCKETS = [
+  { code: "current", label: "Current", key: "current", tone: "success" },
+  { code: "30d", label: "30 Days", key: "30-days", tone: "accent" },
+  { code: "60d", label: "60 Days", key: "60-days", tone: "accent" },
+  { code: "90d", label: "90 Days", key: "90-days", tone: "warning" },
+  { code: "120p", label: "120+ Days", key: "120-plus-days", tone: "danger" },
+  { code: "uncollectible", label: "Uncollectible", key: "uncollectible", tone: "muted" },
+];
+
+function getBucketConfig(bucketCode) {
+  return DASHBOARD_BUCKETS.find((bucket) => bucket.code === bucketCode) || DASHBOARD_BUCKETS[0];
+}
+
+function toPeriodLabel(isoDate, options) {
+  if (!isoDate) {
+    return "Unknown";
+  }
+
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) {
+    return "Unknown";
+  }
+
+  return date.toLocaleDateString("en-US", options);
+}
+
+function formatPercent(value, total) {
+  if (!total) {
+    return "0%";
+  }
+
+  return `${Math.round((value / total) * 100)}%`;
+}
+
+function formatDurationFromHours(totalHours) {
+  if (!Number.isFinite(totalHours) || totalHours <= 0) {
+    return "0h 00m";
+  }
+
+  const hours = Math.floor(totalHours);
+  const minutes = Math.round((totalHours - hours) * 60);
+  return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+}
+
+function normalizeWeekRows(rawRows) {
+  return rawRows
+    .sort((a, b) => String(a.period_date).localeCompare(String(b.period_date)))
+    .map((row) => ({
+      label: toPeriodLabel(row.period_date, { month: "short", day: "numeric" }),
+      date: String(row.period_date || ""),
+      inflow: Number(row.inflow_cents || 0) / 100,
+      outflow: Number(row.outflow_cents || 0) / 100,
+      net: (Number(row.inflow_cents || 0) - Number(row.outflow_cents || 0)) / 100,
+    }));
+}
+
+function normalizeMonthRows(rawRows) {
+  return rawRows
+    .sort((a, b) => String(a.period_date).localeCompare(String(b.period_date)))
+    .map((row) => ({
+      label: toPeriodLabel(row.period_date, { month: "short" }),
+      date: String(row.period_date || ""),
+      inflow: Number(row.inflow_cents || 0) / 100,
+      outflow: Number(row.outflow_cents || 0) / 100,
+      net: (Number(row.inflow_cents || 0) - Number(row.outflow_cents || 0)) / 100,
+    }));
+}
+
+function normalizeQuarterRows(rawRows) {
+  return rawRows
+    .sort((a, b) => String(a.period_date).localeCompare(String(b.period_date)))
+    .map((row) => ({
+      label: `Q${row.quarter} ${row.year}`,
+      date: String(row.period_date || ""),
+      inflow: Number(row.inflow_cents || 0) / 100,
+      outflow: Number(row.outflow_cents || 0) / 100,
+      net: (Number(row.inflow_cents || 0) - Number(row.outflow_cents || 0)) / 100,
+    }));
+}
+
+function normalizeYearRows(rawRows) {
+  return rawRows
+    .sort((a, b) => Number(a.year || 0) - Number(b.year || 0))
+    .map((row) => ({
+      label: String(row.year || "Year"),
+      date: `${row.year || "2000"}-12-31`,
+      inflow: Number(row.inflow_cents || 0) / 100,
+      outflow: Number(row.outflow_cents || 0) / 100,
+      net: (Number(row.inflow_cents || 0) - Number(row.outflow_cents || 0)) / 100,
+    }));
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -321,6 +413,379 @@ app.get("/api/clients", (_req, res) => {
   res.status(200).json({
     clientMetrics,
     clientRows,
+    timelineItems,
+  });
+});
+
+app.get("/api/dashboard", (_req, res) => {
+  ensureInvoicesExist();
+
+  const statRow = db.prepare(`
+    SELECT
+      (SELECT COALESCE(SUM(outstanding_amount_cents), 0) FROM invoices) AS open_receivables_cents,
+      (SELECT COALESCE(SUM(amount_received_cents), 0) FROM payments WHERE strftime('%Y-%m', payment_date) = strftime('%Y-%m', 'now')) AS collected_month_cents,
+      (SELECT COALESCE(SUM(outstanding_amount_cents), 0) FROM invoices WHERE aging_bucket IN ('120p', 'uncollectible')) AS uncollectible_watch_cents,
+      (SELECT COALESCE(AVG(julianday('now') - julianday(date_billed)), 0) FROM invoices WHERE outstanding_amount_cents > 0) AS avg_days_open,
+      (
+        (SELECT COALESCE(SUM(amount_received_cents), 0) FROM payments WHERE strftime('%Y-%m', payment_date) = strftime('%Y-%m', 'now'))
+        -
+        (SELECT COALESCE(SUM(amount_cents), 0) FROM expenses WHERE strftime('%Y-%m', expense_date) = strftime('%Y-%m', 'now'))
+      ) AS net_inflow_month_cents
+  `).get();
+
+  const pendingReviewRow = db.prepare(`
+    SELECT COUNT(*) AS pending_count
+    FROM review_queue
+    WHERE queue_status = 'pending'
+  `).get();
+
+  const approvalSlaRow = db.prepare(`
+    SELECT AVG((julianday(reviewed_at) - julianday(created_at)) * 24.0) AS avg_review_hours
+    FROM review_queue
+    WHERE reviewed_at IS NOT NULL AND queue_status IN ('approved', 'denied')
+  `).get();
+
+  const bucketRows = db.prepare(`
+    SELECT
+      aging_bucket,
+      COUNT(*) AS invoice_count,
+      COALESCE(SUM(outstanding_amount_cents), 0) AS outstanding_cents,
+      COALESCE(SUM(received_amount_cents), 0) AS received_cents,
+      COALESCE(SUM(billed_amount_cents), 0) AS billed_cents
+    FROM invoices
+    GROUP BY aging_bucket
+  `).all();
+
+  const bucketLookup = {};
+  bucketRows.forEach((row) => {
+    bucketLookup[row.aging_bucket] = row;
+  });
+
+  const totalOutstandingCents = DASHBOARD_BUCKETS.reduce((sum, bucket) => {
+    return sum + Number(bucketLookup[bucket.code]?.outstanding_cents || 0);
+  }, 0);
+
+  const agingBuckets = DASHBOARD_BUCKETS.map((bucket) => {
+    const row = bucketLookup[bucket.code] || {};
+    const outstandingCents = Number(row.outstanding_cents || 0);
+
+    return {
+      label: bucket.label,
+      value: formatCurrency(outstandingCents),
+      count: Number(row.invoice_count || 0),
+      share: formatPercent(outstandingCents, totalOutstandingCents),
+      tone: bucket.tone,
+    };
+  });
+
+  const agingVisualBuckets = DASHBOARD_BUCKETS.map((bucket) => {
+    const row = bucketLookup[bucket.code] || {};
+
+    return {
+      bucket: bucket.label,
+      bucketKey: bucket.key,
+      paymentsReceived: Math.round(Number(row.received_cents || 0) / 100),
+      totalInvoiceAmount: Math.round(Number(row.billed_cents || 0) / 100),
+    };
+  });
+
+  const breakdownRows = db.prepare(`
+    SELECT
+      i.aging_bucket,
+      c.name AS client_name,
+      COALESCE(SUM(i.received_amount_cents), 0) AS received_cents,
+      COALESCE(SUM(i.billed_amount_cents), 0) AS billed_cents
+    FROM invoices i
+    INNER JOIN clients c ON c.id = i.client_id
+    GROUP BY i.aging_bucket, c.id
+    ORDER BY i.aging_bucket ASC, billed_cents DESC
+  `).all();
+
+  const bucketClientBreakdown = {};
+  DASHBOARD_BUCKETS.forEach((bucket) => {
+    bucketClientBreakdown[bucket.key] = [];
+  });
+
+  breakdownRows.forEach((row) => {
+    const config = getBucketConfig(row.aging_bucket);
+    const bucketKey = config.key;
+
+    if (bucketClientBreakdown[bucketKey].length >= 8) {
+      return;
+    }
+
+    bucketClientBreakdown[bucketKey].push({
+      client: row.client_name || "Unknown client",
+      paymentsReceived: Math.round(Number(row.received_cents || 0) / 100),
+      totalInvoiceAmount: Math.round(Number(row.billed_cents || 0) / 100),
+    });
+  });
+
+  const monthRows = db.prepare(`
+    WITH inflow AS (
+      SELECT date(payment_date, 'weekday 0', '-6 days') AS period_date, SUM(amount_received_cents) AS cents
+      FROM payments
+      WHERE payment_date >= date('now', 'start of month')
+      GROUP BY period_date
+    ),
+    outflow AS (
+      SELECT date(expense_date, 'weekday 0', '-6 days') AS period_date, SUM(amount_cents) AS cents
+      FROM expenses
+      WHERE expense_date >= date('now', 'start of month')
+      GROUP BY period_date
+    ),
+    periods AS (
+      SELECT period_date FROM inflow
+      UNION
+      SELECT period_date FROM outflow
+    )
+    SELECT
+      periods.period_date,
+      COALESCE(inflow.cents, 0) AS inflow_cents,
+      COALESCE(outflow.cents, 0) AS outflow_cents
+    FROM periods
+    LEFT JOIN inflow ON inflow.period_date = periods.period_date
+    LEFT JOIN outflow ON outflow.period_date = periods.period_date
+    ORDER BY periods.period_date ASC
+  `).all();
+
+  const rolling30Rows = db.prepare(`
+    WITH inflow AS (
+      SELECT date(payment_date, 'weekday 0', '-6 days') AS period_date, SUM(amount_received_cents) AS cents
+      FROM payments
+      WHERE payment_date >= date('now', '-30 days')
+      GROUP BY period_date
+    ),
+    outflow AS (
+      SELECT date(expense_date, 'weekday 0', '-6 days') AS period_date, SUM(amount_cents) AS cents
+      FROM expenses
+      WHERE expense_date >= date('now', '-30 days')
+      GROUP BY period_date
+    ),
+    periods AS (
+      SELECT period_date FROM inflow
+      UNION
+      SELECT period_date FROM outflow
+    )
+    SELECT
+      periods.period_date,
+      COALESCE(inflow.cents, 0) AS inflow_cents,
+      COALESCE(outflow.cents, 0) AS outflow_cents
+    FROM periods
+    LEFT JOIN inflow ON inflow.period_date = periods.period_date
+    LEFT JOIN outflow ON outflow.period_date = periods.period_date
+    ORDER BY periods.period_date ASC
+  `).all();
+
+  const rolling60Rows = db.prepare(`
+    WITH inflow AS (
+      SELECT date(payment_date, 'start of month') AS period_date, SUM(amount_received_cents) AS cents
+      FROM payments
+      WHERE payment_date >= date('now', '-60 days')
+      GROUP BY period_date
+    ),
+    outflow AS (
+      SELECT date(expense_date, 'start of month') AS period_date, SUM(amount_cents) AS cents
+      FROM expenses
+      WHERE expense_date >= date('now', '-60 days')
+      GROUP BY period_date
+    ),
+    periods AS (
+      SELECT period_date FROM inflow
+      UNION
+      SELECT period_date FROM outflow
+    )
+    SELECT
+      periods.period_date,
+      COALESCE(inflow.cents, 0) AS inflow_cents,
+      COALESCE(outflow.cents, 0) AS outflow_cents
+    FROM periods
+    LEFT JOIN inflow ON inflow.period_date = periods.period_date
+    LEFT JOIN outflow ON outflow.period_date = periods.period_date
+    ORDER BY periods.period_date ASC
+  `).all();
+
+  const rolling90Rows = db.prepare(`
+    WITH inflow AS (
+      SELECT date(payment_date, 'start of month') AS period_date, SUM(amount_received_cents) AS cents
+      FROM payments
+      WHERE payment_date >= date('now', '-90 days')
+      GROUP BY period_date
+    ),
+    outflow AS (
+      SELECT date(expense_date, 'start of month') AS period_date, SUM(amount_cents) AS cents
+      FROM expenses
+      WHERE expense_date >= date('now', '-90 days')
+      GROUP BY period_date
+    ),
+    periods AS (
+      SELECT period_date FROM inflow
+      UNION
+      SELECT period_date FROM outflow
+    )
+    SELECT
+      periods.period_date,
+      COALESCE(inflow.cents, 0) AS inflow_cents,
+      COALESCE(outflow.cents, 0) AS outflow_cents
+    FROM periods
+    LEFT JOIN inflow ON inflow.period_date = periods.period_date
+    LEFT JOIN outflow ON outflow.period_date = periods.period_date
+    ORDER BY periods.period_date ASC
+  `).all();
+
+  const quarterRows = db.prepare(`
+    WITH inflow AS (
+      SELECT
+        CAST(strftime('%Y', payment_date) AS INTEGER) AS year,
+        CAST(((CAST(strftime('%m', payment_date) AS INTEGER) - 1) / 3) + 1 AS INTEGER) AS quarter,
+        SUM(amount_received_cents) AS cents
+      FROM payments
+      WHERE payment_date >= date('now', '-12 months')
+      GROUP BY year, quarter
+    ),
+    outflow AS (
+      SELECT
+        CAST(strftime('%Y', expense_date) AS INTEGER) AS year,
+        CAST(((CAST(strftime('%m', expense_date) AS INTEGER) - 1) / 3) + 1 AS INTEGER) AS quarter,
+        SUM(amount_cents) AS cents
+      FROM expenses
+      WHERE expense_date >= date('now', '-12 months')
+      GROUP BY year, quarter
+    ),
+    periods AS (
+      SELECT year, quarter FROM inflow
+      UNION
+      SELECT year, quarter FROM outflow
+    )
+    SELECT
+      periods.year,
+      periods.quarter,
+      printf('%04d-%02d-01', periods.year, ((periods.quarter - 1) * 3) + 1) AS period_date,
+      COALESCE(inflow.cents, 0) AS inflow_cents,
+      COALESCE(outflow.cents, 0) AS outflow_cents
+    FROM periods
+    LEFT JOIN inflow ON inflow.year = periods.year AND inflow.quarter = periods.quarter
+    LEFT JOIN outflow ON outflow.year = periods.year AND outflow.quarter = periods.quarter
+    ORDER BY periods.year ASC, periods.quarter ASC
+  `).all();
+
+  const yearRows = db.prepare(`
+    WITH inflow AS (
+      SELECT CAST(strftime('%Y', payment_date) AS INTEGER) AS year, SUM(amount_received_cents) AS cents
+      FROM payments
+      WHERE payment_date >= date('now', '-4 years')
+      GROUP BY year
+    ),
+    outflow AS (
+      SELECT CAST(strftime('%Y', expense_date) AS INTEGER) AS year, SUM(amount_cents) AS cents
+      FROM expenses
+      WHERE expense_date >= date('now', '-4 years')
+      GROUP BY year
+    ),
+    periods AS (
+      SELECT year FROM inflow
+      UNION
+      SELECT year FROM outflow
+    )
+    SELECT
+      periods.year,
+      COALESCE(inflow.cents, 0) AS inflow_cents,
+      COALESCE(outflow.cents, 0) AS outflow_cents
+    FROM periods
+    LEFT JOIN inflow ON inflow.year = periods.year
+    LEFT JOIN outflow ON outflow.year = periods.year
+    ORDER BY periods.year ASC
+  `).all();
+
+  const recentTimelineRows = db.prepare(`
+    SELECT
+      COALESCE(event_type, 'field_update') AS event_type,
+      COALESCE(entity_type, 'invoice') AS entity_type,
+      COALESCE(entity_code, 'N/A') AS entity_code,
+      COALESCE(actor_name, 'System') AS actor_name,
+      COALESCE(change_reason, '') AS change_reason,
+      event_at
+    FROM audit_log
+    ORDER BY event_at DESC, id DESC
+    LIMIT 6
+  `).all();
+
+  const timelineItems = recentTimelineRows.map((row, index) => {
+    const normalizedType = String(row.event_type || "").toLowerCase();
+    let tone = "accent";
+
+    if (normalizedType.includes("payment")) {
+      tone = "success";
+    } else if (normalizedType.includes("denial") || normalizedType.includes("reject")) {
+      tone = "danger";
+    } else if (normalizedType.includes("escalation")) {
+      tone = "warning";
+    }
+
+    return {
+      id: `dashboard-timeline-${index + 1}`,
+      title: `${row.event_type.replace(/_/g, " ")} - ${row.entity_code}`,
+      detail: row.change_reason || `${row.entity_type} updated by ${row.actor_name}`,
+      meta: compactTimestamp(row.event_at),
+      tone,
+    };
+  });
+
+  const currentMonthPaymentCents = Number(statRow?.collected_month_cents || 0);
+  const pendingCount = Number(pendingReviewRow?.pending_count || 0);
+  const openReceivablesCents = Number(statRow?.open_receivables_cents || 0);
+  const uncollectibleWatchCents = Number(statRow?.uncollectible_watch_cents || 0);
+
+  const heroMetrics = [
+    { label: "Approval SLA", value: formatDurationFromHours(Number(approvalSlaRow?.avg_review_hours || 0)) },
+    { label: "Avg days in AR", value: Number(statRow?.avg_days_open || 0).toFixed(1) },
+    { label: "Claims flagged", value: String(pendingCount) },
+    { label: "Net inflow", value: formatCurrency(Number(statRow?.net_inflow_month_cents || 0)) },
+  ];
+
+  const statCards = [
+    {
+      title: "Open receivables",
+      value: formatCurrency(openReceivablesCents),
+      trend: { label: "Live", context: "Outstanding invoice balances" },
+      tone: "accent",
+    },
+    {
+      title: "Collected this month",
+      value: formatCurrency(currentMonthPaymentCents),
+      trend: { label: "Live", context: "Posted payments in current month" },
+      tone: "success",
+    },
+    {
+      title: "Pending review",
+      value: String(pendingCount),
+      trend: { label: "Admin action", context: "Review queue pending items" },
+      tone: "warning",
+    },
+    {
+      title: "Uncollectible watch",
+      value: formatCurrency(uncollectibleWatchCents),
+      trend: { label: "Live", context: "120+ and uncollectible balances" },
+      tone: "danger",
+    },
+  ];
+
+  const cashFlowByPeriod = {
+    month: normalizeWeekRows(monthRows),
+    "30d": normalizeWeekRows(rolling30Rows),
+    "60d": normalizeMonthRows(rolling60Rows),
+    "90d": normalizeMonthRows(rolling90Rows),
+    quarter: normalizeQuarterRows(quarterRows),
+    year: normalizeYearRows(yearRows),
+  };
+
+  res.status(200).json({
+    heroMetrics,
+    statCards,
+    agingBuckets,
+    agingVisualBuckets,
+    bucketClientBreakdown,
+    cashFlowByPeriod,
     timelineItems,
   });
 });
