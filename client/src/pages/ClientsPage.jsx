@@ -171,7 +171,10 @@ function ClientsPage({ shell }) {
             }
             columns={columns}
             description={clientsCopy.sections.clientTable.tableDescription}
-            onRowClick={setSelectedClientId}
+            onRowClick={(rowId) => {
+              setSelectedClientId(rowId)
+              shell.onNavigate({ path: `/clients/${encodeURIComponent(rowId)}` })
+            }}
             rowSelectionEnabled
             rows={clientRows}
             selectedRowId={selectedClientId}

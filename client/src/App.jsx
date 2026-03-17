@@ -10,6 +10,7 @@ import AuditLogPage from './pages/AuditLogPage'
 import PreviewPage from './pages/PreviewPage'
 import NewClientPage from './pages/NewClientPage'
 import InvoiceFormPage from './pages/InvoiceFormPage'
+import ClientDetailPage from './pages/ClientDetailPage'
 import AgingSummaryReportPage from './pages/AgingSummaryReportPage'
 import CashFlowReportPage from './pages/CashFlowReportPage'
 import { DEFAULT_PATH, NAV_ITEMS, getActiveNavKey } from './routes/appRoutes'
@@ -31,6 +32,7 @@ function RoutedApp() {
       <Route path="/aging" element={<ArAgingPage shell={shell} />} />
       <Route path="/aging/bucket/:bucketName" element={<ArAgingBucketDetailPage shell={shell} />} />
       <Route path="/clients" element={<ClientsPage shell={shell} />} />
+      <Route path="/clients/:clientCode" element={<ClientDetailPage shell={shell} />} />
       <Route path="/expenses" element={<ExpensesPage shell={shell} />} />
       <Route path="/review" element={<ReviewInboxPage shell={shell} />} />
       <Route path="/audit" element={<AuditLogPage shell={shell} />} />

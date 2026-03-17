@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const { createDbConnection } = require("./db/connection");
 const { runSchemaMigration } = require("./db/migrate");
+const { seedDemoData } = require("./db/seedDemoData");
 
 dotenv.config();
 
@@ -19,6 +20,37 @@ function formatCurrency(cents) {
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(dollars);
+}
+
+function toCents(value) {
+  if (typeof value === "number") {
+    return Math.round(value * 100);
+  }
+
+  const text = String(value || "").trim().replace(/[$,]/g, "");
+  if (!text) {
+    return 0;
+  }
+
+  const parsed = Number(text);
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+
+  return Math.round(parsed * 100);
+}
+
+function toIsoDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().slice(0, 10);
 }
 
 function asDateLabel(value) {
@@ -86,6 +118,75 @@ function mapReviewType(entityType) {
   return "Invoice edit";
 }
 
+function mapInvoiceStatus(status) {
+  const value = String(status || "").toLowerCase();
+
+  if (value === "approved" || value === "active") {
+    return { label: "Ready", tone: "success" };
+  }
+
+  if (value === "pending_review" || value === "draft") {
+    return { label: "Needs review", tone: "warning" };
+  }
+
+  if (value === "rejected") {
+    return { label: "Denied", tone: "danger" };
+  }
+
+  return { label: "Queued", tone: "muted" };
+}
+
+function normalizeBucketKey(value) {
+  const key = String(value || "").toLowerCase();
+
+  if (key === "current") {
+    return "current";
+  }
+
+  if (key === "30-days" || key === "30d") {
+    return "30d";
+  }
+
+  if (key === "60-days" || key === "60d") {
+    return "60d";
+  }
+
+  if (key === "90-days" || key === "90d") {
+    return "90d";
+  }
+
+  if (key === "120-plus-days" || key === "120p" || key === "120") {
+    return "120p";
+  }
+
+  if (key === "uncollectible") {
+    return "uncollectible";
+  }
+
+  return "current";
+}
+
+function mapInvoiceRow(row) {
+  return {
+    id: row.invoice_code,
+    client: row.client_name,
+    serviceDate: asDateLabel(row.date_billed),
+    company: row.company_name,
+    billedAmount: formatCurrency(row.billed_amount_cents),
+    receivedAmount: formatCurrency(row.received_amount_cents),
+    status: mapInvoiceStatus(row.status),
+    bucket: row.aging_bucket,
+  };
+}
+
+function ensureInvoicesExist() {
+  const counts = db.prepare("SELECT COUNT(*) AS client_count, (SELECT COUNT(*) FROM invoices) AS invoice_count FROM clients").get();
+
+  if (Number(counts?.invoice_count || 0) === 0) {
+    seedDemoData();
+  }
+}
+
 function compactTimestamp(value) {
   if (!value) {
     return "Unknown time";
@@ -108,7 +209,35 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok", service: "ar-billing-tracker-server" });
 });
 
+app.get("/api/invoices", (req, res) => {
+  ensureInvoicesExist();
+
+  const bucket = normalizeBucketKey(req.query.bucket);
+  const rows = db.prepare(`
+    SELECT
+      i.invoice_code,
+      i.date_billed,
+      i.billed_amount_cents,
+      i.received_amount_cents,
+      i.status,
+      i.aging_bucket,
+      c.name AS client_name,
+      comp.name AS company_name
+    FROM invoices i
+    INNER JOIN clients c ON c.id = i.client_id
+    INNER JOIN companies comp ON comp.id = i.company_id
+    WHERE i.aging_bucket = ?
+    ORDER BY i.date_billed DESC, i.id DESC
+  `).all(bucket);
+
+  res.status(200).json({
+    invoiceRows: rows.map(mapInvoiceRow),
+  });
+});
+
 app.get("/api/clients", (_req, res) => {
+  ensureInvoicesExist();
+
   const rows = db.prepare(`
     SELECT
       c.id,
@@ -194,6 +323,157 @@ app.get("/api/clients", (_req, res) => {
     clientRows,
     timelineItems,
   });
+});
+
+app.get("/api/clients/options", (_req, res) => {
+  const rows = db.prepare(`
+    SELECT client_code, name, contact_name
+    FROM clients
+    ORDER BY name COLLATE NOCASE ASC
+  `).all();
+
+  const options = rows.map((row) => ({
+    value: row.client_code,
+    label: `${row.name} / ${row.contact_name || "Unassigned"}`,
+  }));
+
+  res.status(200).json({ options });
+});
+
+app.post("/api/clients", (req, res) => {
+  const name = String(req.body?.name || "").trim();
+  const contactName = String(req.body?.contactName || "").trim();
+
+  if (!name) {
+    res.status(400).json({ error: "Client name is required." });
+    return;
+  }
+
+  const maxCode = db.prepare("SELECT MAX(id) AS max_id FROM clients").get();
+  const nextNumber = Number(maxCode?.max_id || 0) + 1;
+  const clientCode = `CLI-${String(nextNumber).padStart(3, "0")}`;
+
+  db.prepare(`
+    INSERT INTO clients (
+      client_code,
+      external_id,
+      name,
+      contact_name,
+      status,
+      is_verified,
+      created_by_user_id,
+      updated_by_user_id
+    ) VALUES (?, ?, ?, ?, 'active', 1, 1, 1)
+  `).run(clientCode, `EXT-${clientCode}`, name, contactName || null);
+
+  const created = db.prepare(`
+    SELECT client_code, name, contact_name, status
+    FROM clients
+    WHERE client_code = ?
+  `).get(clientCode);
+
+  res.status(201).json({
+    client: {
+      id: created.client_code,
+      name: created.name,
+      contactName: created.contact_name || "Unassigned",
+      status: mapClientStatus(created.status),
+    },
+  });
+});
+
+app.get("/api/clients/:clientCode/detail", (req, res) => {
+  const clientCode = String(req.params.clientCode || "");
+  const detail = db.prepare(`
+    SELECT
+      c.client_code,
+      c.name,
+      c.contact_name,
+      c.status,
+      c.total_outstanding_cents,
+      c.days_past_due_max,
+      c.last_payment_at,
+      COUNT(DISTINCT i.id) AS total_invoices,
+      COUNT(DISTINCT p.id) AS total_payments
+    FROM clients c
+    LEFT JOIN invoices i ON i.client_id = c.id
+    LEFT JOIN invoice_payments ip ON ip.invoice_id = i.id
+    LEFT JOIN payments p ON p.id = ip.payment_id
+    WHERE c.client_code = ?
+    GROUP BY c.id
+  `).get(clientCode);
+
+  if (!detail) {
+    res.status(404).json({ error: "Client not found." });
+    return;
+  }
+
+  res.status(200).json({
+    summary: {
+      id: detail.client_code,
+      name: detail.name,
+      contact: detail.contact_name || "Unassigned",
+      status: mapClientStatus(detail.status),
+      totalOutstanding: formatCurrency(detail.total_outstanding_cents),
+      daysPastDue: String(detail.days_past_due_max || 0),
+      lastPaymentDate: asDateLabel(detail.last_payment_at),
+      totalInvoices: String(detail.total_invoices || 0),
+      totalPayments: String(detail.total_payments || 0),
+    },
+  });
+});
+
+app.get("/api/clients/:clientCode/invoices", (req, res) => {
+  const clientCode = String(req.params.clientCode || "");
+  const rows = db.prepare(`
+    SELECT
+      i.invoice_code,
+      i.date_billed,
+      i.billed_amount_cents,
+      i.received_amount_cents,
+      i.status,
+      i.aging_bucket,
+      c.name AS client_name,
+      comp.name AS company_name
+    FROM invoices i
+    INNER JOIN clients c ON c.id = i.client_id
+    INNER JOIN companies comp ON comp.id = i.company_id
+    WHERE c.client_code = ?
+    ORDER BY i.date_billed DESC, i.id DESC
+  `).all(clientCode);
+
+  res.status(200).json({
+    invoiceRows: rows.map(mapInvoiceRow),
+  });
+});
+
+app.get("/api/clients/:clientCode/payments", (req, res) => {
+  const clientCode = String(req.params.clientCode || "");
+  const rows = db.prepare(`
+    SELECT
+      p.payment_code,
+      p.payment_date,
+      p.amount_received_cents,
+      p.status,
+      COUNT(ip.invoice_id) AS invoice_count
+    FROM payments p
+    INNER JOIN invoice_payments ip ON ip.payment_id = p.id
+    INNER JOIN invoices i ON i.id = ip.invoice_id
+    INNER JOIN clients c ON c.id = i.client_id
+    WHERE c.client_code = ?
+    GROUP BY p.id
+    ORDER BY p.payment_date DESC, p.id DESC
+  `).all(clientCode);
+
+  const paymentRows = rows.map((row) => ({
+    id: row.payment_code,
+    paymentDate: asDateLabel(row.payment_date),
+    amount: formatCurrency(row.amount_received_cents),
+    allocations: `${row.invoice_count} invoice${row.invoice_count === 1 ? "" : "s"}`,
+    status: mapInvoiceStatus(row.status),
+  }));
+
+  res.status(200).json({ paymentRows });
 });
 
 app.get("/api/review-inbox", (_req, res) => {
@@ -300,6 +580,105 @@ app.get("/api/review-inbox", (_req, res) => {
     reviewRows,
     diffById,
     timelineItems,
+  });
+});
+
+app.post("/api/payments", (req, res) => {
+  const payload = req.body || {};
+  const paymentDate = toIsoDate(payload.paymentDate);
+  const amountCents = toCents(payload.amountReceived);
+
+  if (!paymentDate || amountCents <= 0) {
+    res.status(400).json({ error: "paymentDate and amountReceived are required." });
+    return;
+  }
+
+  const companyIdRow = db.prepare("SELECT id FROM companies ORDER BY id ASC LIMIT 1").get();
+  const nextId = Number(db.prepare("SELECT IFNULL(MAX(id), 0) AS max_id FROM payments").get().max_id) + 1;
+  const paymentCode = payload.paymentCode || `PAY-MAN-${String(nextId).padStart(5, "0")}`;
+
+  db.prepare(`
+    INSERT INTO payments (
+      payment_code,
+      external_payment_id,
+      payment_date,
+      amount_received_cents,
+      reference_no,
+      company_id,
+      status,
+      allocation_method,
+      reconciliation_status,
+      notes,
+      created_by_user_id,
+      updated_by_user_id
+    ) VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, 'unmatched', ?, 1, 1)
+  `).run(
+    paymentCode,
+    `EXT-${paymentCode}`,
+    paymentDate,
+    amountCents,
+    payload.referenceNumber || null,
+    companyIdRow?.id || null,
+    payload.allocationMethod || "manual",
+    payload.notes || null,
+  );
+
+  res.status(201).json({
+    payment: {
+      id: paymentCode,
+      paymentDate: asDateLabel(paymentDate),
+      amount: formatCurrency(amountCents),
+      status: mapInvoiceStatus("draft"),
+    },
+  });
+});
+
+app.post("/api/expenses", (req, res) => {
+  const payload = req.body || {};
+  const expenseDate = toIsoDate(payload.expenseDate);
+  const amountCents = toCents(payload.amount);
+  const vendorName = String(payload.vendorName || "").trim();
+
+  if (!expenseDate || amountCents <= 0 || !vendorName) {
+    res.status(400).json({ error: "vendorName, expenseDate and amount are required." });
+    return;
+  }
+
+  const categoryIdRow = db.prepare("SELECT id FROM expense_categories ORDER BY id ASC LIMIT 1").get();
+  const nextId = Number(db.prepare("SELECT IFNULL(MAX(id), 0) AS max_id FROM expenses").get().max_id) + 1;
+  const expenseCode = payload.expenseCode || `EXP-MAN-${String(nextId).padStart(4, "0")}`;
+
+  db.prepare(`
+    INSERT INTO expenses (
+      expense_code,
+      external_expense_id,
+      vendor_name,
+      expense_date,
+      category_id,
+      amount_cents,
+      status,
+      notes,
+      created_by_user_id,
+      updated_by_user_id
+    ) VALUES (?, ?, ?, ?, ?, ?, 'draft', ?, 1, 1)
+  `).run(
+    expenseCode,
+    `EXT-${expenseCode}`,
+    vendorName,
+    expenseDate,
+    categoryIdRow?.id || 1,
+    amountCents,
+    payload.notes || null,
+  );
+
+  res.status(201).json({
+    expense: {
+      id: expenseCode,
+      vendorName,
+      expenseDate: asDateLabel(expenseDate),
+      amount: formatCurrency(amountCents),
+      status: mapInvoiceStatus("draft"),
+    },
   });
 });
 

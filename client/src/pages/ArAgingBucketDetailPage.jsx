@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import AppShell from '../components/shell/AppShell'
 import Button from '../components/primitives/Button'
@@ -9,6 +9,7 @@ import agingSampleData from './data/agingSampleData.json'
 import pageCopy from './data/pageCopy.json'
 import { filterInvoicesByBucket, normalizeAgingSampleData } from '../utils/sampleDataContracts'
 import { getShellBrandTitle, normalizePageCopy } from '../utils/pageCopyContracts'
+import { fetchJson } from '../utils/apiClient'
 
 const normalizedAgingData = normalizeAgingSampleData(agingSampleData)
 const agingCopy = normalizePageCopy('aging', pageCopy)
@@ -42,24 +43,61 @@ function formatBucketLabel(bucketName) {
 function ArAgingBucketDetailPage({ shell }) {
   const { bucketName = '' } = useParams()
   const [query, setQuery] = useState('')
+  const [invoiceRows, setInvoiceRows] = useState(() => filterInvoicesByBucket(normalizedAgingData.invoiceRows, bucketName))
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
 
-  const bucketRows = useMemo(
-    () => filterInvoicesByBucket(normalizedAgingData.invoiceRows, bucketName),
-    [bucketName],
-  )
+  useEffect(() => {
+    let isActive = true
+
+    async function loadBucketInvoices() {
+      try {
+        const payload = await fetchJson(`/api/invoices?bucket=${encodeURIComponent(bucketName)}`)
+        if (!isActive) {
+          return
+        }
+
+        const normalized = normalizeAgingSampleData({
+          invoiceRows: payload?.invoiceRows ?? [],
+          agingBuckets: [],
+          timelineItems: [],
+        })
+
+        setInvoiceRows(normalized.invoiceRows)
+        setLoadError('')
+      } catch {
+        if (!isActive) {
+          return
+        }
+
+        setInvoiceRows(filterInvoicesByBucket(normalizedAgingData.invoiceRows, bucketName))
+        setLoadError('Live data unavailable. Showing sample dataset.')
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadBucketInvoices()
+
+    return () => {
+      isActive = false
+    }
+  }, [bucketName])
 
   const filteredRows = useMemo(() => {
     const text = query.trim().toLowerCase()
     if (!text) {
-      return bucketRows
+      return invoiceRows
     }
 
-    return bucketRows.filter((row) => (
+    return invoiceRows.filter((row) => (
       String(row.client).toLowerCase().includes(text)
       || String(row.id).toLowerCase().includes(text)
       || String(row.company).toLowerCase().includes(text)
     ))
-  }, [bucketRows, query])
+  }, [invoiceRows, query])
 
   const detailPanel = {
     title: 'Bucket focus',
@@ -91,13 +129,14 @@ function ArAgingBucketDetailPage({ shell }) {
             <p className="page-copy">Search and review invoices in this aging segment.</p>
           </div>
           <div className="page-actions">
-            <span className="page-badge">Bucket drill-down</span>
+            <span className="page-badge">{isLoading ? 'Loading invoices...' : 'Bucket drill-down'}</span>
             <Button onClick={() => shell.onNavigate({ path: '/aging' })} size="sm" variant="secondary">Back to AR Aging</Button>
           </div>
         </header>
       }
     >
       <div className="page-stack">
+        {loadError ? <p className="page-copy">{loadError}</p> : null}
         <SectionContainer
           description="Use quick search to narrow by client, invoice, or company."
           eyebrow="Drill-down"

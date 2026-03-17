@@ -13,6 +13,10 @@ export function getActiveNavKey(pathname) {
     return 'aging'
   }
 
+  if (pathname.startsWith('/clients/')) {
+    return 'clients'
+  }
+
   for (const item of NAV_ITEMS) {
     if (item.path && item.path === pathname) {
       return item.key
